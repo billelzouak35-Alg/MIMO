@@ -399,9 +399,14 @@ async function loadData(bizId) {
       sb.from(b.table_products).select('*').order('created_at',{ascending:true}),
       sb.from(b.table_articles).select('*').order('created_at',{ascending:true})
     ]);
+    if(p.error) console.error(`Products ${bizId}:`,p.error.message);
+    if(a.error) console.error(`Articles ${bizId}:`,a.error.message);
     allData[bizId].products=p.data||[];
     allData[bizId].articles=a.data||[];
-  } catch(e) { console.error(`Load ${bizId}:`,e); }
+  } catch(e) {
+    console.error(`Load ${bizId}:`,e);
+    alert('خطأ في الاتصال بقاعدة البيانات. تأكدي من تشغيل ملف SQL أولًا.');
+  }
 }
 async function loadAllData() { if(!sb) return; await Promise.all(['mercerie','rental','patisserie'].map(loadData)); }
 
