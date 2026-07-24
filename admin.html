@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة الإدارة — ميمو منصتي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg: #0A0A0F;
+  --bg-card: #141419;
+  --bg-elevated: #1C1C24;
+  --bg-glass: rgba(20,20,25,.72);
+  --surface: #1E1E28;
+  --border: rgba(255,255,255,.06);
+  --border-hover: rgba(255,255,255,.12);
+  --text: #F0EFF4;
+  --text-secondary: #8B8A94;
+  --text-muted: #5A5968;
+  --accent: #6C5CE7;
+  --accent-2: #A29BFE;
+  --accent-glow: rgba(108,92,231,.25);
+  --success: #00D2A0;
+  --warning: #FDCB6E;
+  --danger: #FF6B6B;
+  --info: #74B9FF;
+  --biz-mercerie: #E84393;
+  --biz-rental: #FDCB6E;
+  --biz-patisserie: #FF7675;
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-xl: 32px;
+  --r-full: 100px;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.3);
+  --shadow-md: 0 8px 32px rgba(0,0,0,.4);
+  --shadow-lg: 0 16px 64px rgba(0,0,0,.5);
+  --font-ar: 'IBM Plex Sans Arabic', sans-serif;
+  --font-en: 'Space Grotesk', sans-serif;
+}
+html[data-theme="light"] {
+  --bg: #F5F5F7;
+  --bg-card: #FFFFFF;
+  --bg-elevated: #FFFFFF;
+  --bg-glass: rgba(255,255,255,.82);
+  --surface: #F0F0F2;
+  --border: rgba(0,0,0,.06);
+  --border-hover: rgba(0,0,0,.12);
+  --text: #1A1A2E;
+  --text-secondary: #6B6B80;
+  --text-muted: #9B9BAD;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.06);
+  --shadow-md: 0 8px 32px rgba(0,0,0,.08);
+  --shadow-lg: 0 16px 64px rgba(0,0,0,.1);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: var(--font-ar);
+  background: var(--bg);
+  color: var(--text);
+  line-height:1.7;
+  min-height:100vh;
+}
+h1,h2,h3,h4 { font-family: var(--font-ar); font-weight:700; }
+a { text-decoration:none; color:inherit; }
+button { font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; }
+img { max-width:100%; display:block; }
+.hidden { display:none !important; }
+
+/* HEADER */
+.admin-topbar {
+  position:sticky; top:0; z-index:100;
+  padding:16px 5vw;
+  background:var(--bg-glass);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.admin-topbar-left { display:flex; align-items:center; gap:14px; }
+.admin-topbar .logo-icon {
+  width:auto; height:36px; padding:0 12px; border-radius:var(--r-sm);
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  display:flex; align-items:center; justify-content:center;
+  font-size:.82rem; color:#fff; font-weight:800; letter-spacing:1px;
+}
+.admin-topbar h1 { font-size:1.1rem; }
+.admin-topbar-right { display:flex; align-items:center; gap:12px; }
+.admin-topbar a, .admin-topbar button {
+  padding:8px 16px; border-radius:var(--r-full);
+  font-size:.85rem; font-weight:600;
+  border:1px solid var(--border); background:var(--bg-card);
+  color:var(--text-secondary); transition:all .25s;
+}
+.admin-topbar a:hover, .admin-topbar button:hover {
+  border-color:var(--accent); color:var(--accent);
+}
+
+/* THEME TOGGLE */
+.theme-btn {
+  width:38px; height:38px; border-radius:var(--r-sm);
+  border:1px solid var(--border); background:var(--bg-card);
+  display:flex; align-items:center; justify-content:center;
+  transition:all .25s;
+}
+.theme-btn:hover { border-color:var(--accent); }
+.theme-btn svg { width:18px; height:18px; stroke:var(--text-secondary); fill:none; stroke-width:2; }
+
+/* MAIN */
+.admin-page { padding:40px 5vw 80px; max-width:1100px; margin:0 auto; }
+.admin-header { text-align:center; margin-bottom:40px; }
+.admin-header h1 { font-size:1.8rem; margin-bottom:8px; }
+.admin-header p { color:var(--text-secondary); }
+
+/* BIZ TABS */
+.admin-biz-tabs { display:flex; gap:8px; justify-content:center; margin-bottom:32px; flex-wrap:wrap; }
+.admin-biz-tab {
+  padding:10px 24px; border-radius:var(--r-full);
+  font-weight:600; font-size:.88rem;
+  border:1px solid var(--border); background:var(--bg-card);
+  color:var(--text-secondary); transition:all .25s;
+}
+.admin-biz-tab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+.admin-biz-tab:hover:not(.active) { border-color:var(--border-hover); color:var(--text); }
+
+/* GRID */
+.admin-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:24px; }
+.admin-panel {
+  background:var(--bg-card); border:1px solid var(--border);
+  border-radius:var(--r-xl); padding:28px;
+}
+.admin-panel h3 { font-size:1.1rem; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+.admin-panel h3 .count {
+  font-size:.75rem; padding:3px 10px; border-radius:var(--r-full);
+  background:var(--accent-glow); color:var(--accent); font-weight:600;
+}
+.admin-add-btn {
+  width:100%; padding:12px; border-radius:var(--r-md);
+  border:2px dashed var(--border);
+  color:var(--text-muted); font-weight:600; font-size:.9rem;
+  transition:all .25s; margin-bottom:16px;
+}
+.admin-add-btn:hover { border-color:var(--accent); color:var(--accent); }
+.admin-item {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 0; border-bottom:1px solid var(--border);
+}
+.admin-item:last-child { border-bottom:none; }
+.admin-item-info { flex:1; }
+.admin-item-info h4 { font-size:.92rem; font-weight:600; }
+.admin-item-info span { font-size:.8rem; color:var(--text-muted); }
+.admin-item-actions { display:flex; gap:6px; }
+.admin-item-actions button {
+  width:32px; height:32px; border-radius:var(--r-sm);
+  background:var(--surface); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-size:.8rem; transition:all .2s;
+}
+.admin-item-actions .edit-btn:hover { color:var(--accent); border-color:var(--accent); }
+.admin-item-actions .delete-btn:hover { color:var(--danger); border-color:var(--danger); }
+
+/* MODALS */
+.modal-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,.6);
+  backdrop-filter:blur(8px); z-index:300;
+  display:flex; align-items:center; justify-content:center; padding:20px;
+  opacity:0; pointer-events:none; transition:opacity .3s;
+}
+.modal-overlay.open { opacity:1; pointer-events:auto; }
+.modal-box {
+  background:var(--bg-elevated); border:1px solid var(--border);
+  border-radius:var(--r-xl); padding:36px; max-width:460px; width:100%;
+  max-height:88vh; overflow-y:auto;
+  box-shadow:var(--shadow-lg);
+  transform:translateY(20px); transition:transform .3s;
+}
+.modal-overlay.open .modal-box { transform:translateY(0); }
+.modal-box h3 { font-size:1.2rem; margin-bottom:24px; }
+.modal-box label { display:block; font-size:.82rem; font-weight:600; margin-bottom:6px; color:var(--text-secondary); }
+.modal-box input, .modal-box textarea {
+  width:100%; padding:12px 16px; border:1px solid var(--border);
+  border-radius:var(--r-md); margin-bottom:16px;
+  font-family:inherit; font-size:.95rem;
+  background:var(--surface); color:var(--text);
+  transition:border-color .2s;
+}
+.modal-box input:focus, .modal-box textarea:focus { border-color:var(--accent); outline:none; }
+.modal-box textarea { min-height:80px; resize:vertical; }
+.modal-actions { display:flex; gap:12px; margin-top:8px; }
+.modal-actions button { flex:1; padding:13px; border-radius:var(--r-md); font-weight:700; }
+.modal-save { background:var(--accent); color:#fff; border:none; }
+.modal-cancel { background:var(--surface); border:1px solid var(--border); color:var(--text-secondary); }
+
+/* PRODUCT BTN */
+.product-btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:14px 28px; border-radius:var(--r-full); width:auto;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:#fff; font-weight:700; font-size:.95rem;
+  transition:all .3s; border:none; cursor:pointer;
+}
+.product-btn:hover { opacity:.9; transform:translateY(-1px); }
+
+/* LANG SWITCH */
+.lang-switch { position:relative; }
+.lang-select {
+  appearance:none; -webkit-appearance:none;
+  padding:8px 32px 8px 12px; border-radius:var(--r-full);
+  border:1px solid var(--border); background:var(--bg-card);
+  color:var(--text-secondary); font-size:.82rem; font-weight:600;
+  font-family:inherit; cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238B8A94' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 10px center;
+}
+.lang-select:focus { outline:none; border-color:var(--accent); }
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .admin-grid { grid-template-columns:1fr; }
+  .admin-page { padding:20px 4vw 60px; }
+  .admin-topbar { padding:12px 4vw; }
+  .admin-topbar h1 { font-size:.95rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="admin-topbar">
+  <div class="admin-topbar-left">
+    <a href="index.html" class="logo-icon" style="cursor:pointer">M</a>
+    <h1>لوحة الإدارة</h1>
+  </div>
+  <div class="admin-topbar-right">
+    <div class="lang-switch">
+      <select class="lang-select" id="langSwitch">
+        <option value="ar" selected>AR</option>
+        <option value="fr">FR</option>
+        <option value="en">EN</option>
+      </select>
+    </div>
+    <button class="theme-btn" id="themeToggle">
+      <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+    </button>
+    <a href="index.html">العودة للمنصة</a>
+  </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<div class="admin-page">
+  <div class="admin-header">
+    <h1 id="adminTitle">لوحة الإدارة</h1>
+    <p id="adminSub">أضيفي وعدّلي واحذفي المنتجات لكل مشروع</p>
+  </div>
+  <div id="adminLoginPrompt" style="text-align:center;margin-bottom:30px;">
+    <button class="product-btn" id="adminLoginBtn">دخول الإدارة</button>
+  </div>
+  <div id="adminContent" class="hidden">
+    <div class="admin-biz-tabs" id="adminBizTabs"></div>
+    <div class="admin-grid" id="adminGrid"></div>
+  </div>
+</div>
+
+<!-- ITEM MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <h3 id="modalTitle">إضافة منتج</h3>
+    <form id="itemForm">
+      <label id="labelTitle">الاسم</label>
+      <input type="text" id="fieldTitle" required>
+      <label id="labelPrice">السعر</label>
+      <input type="text" id="fieldPrice" placeholder="مثال: 1,200 دج">
+      <label id="labelTag">الوسم</label>
+      <input type="text" id="fieldTag" placeholder="مثال: للمبتدئات">
+      <label id="labelDesc">الوصف المختصر</label>
+      <textarea id="fieldDesc"></textarea>
+      <label>الصورة (اختياري)</label>
+      <input type="file" id="fieldImage" accept="image/*">
+      <div class="modal-actions">
+        <button type="button" class="modal-cancel" id="modalCancel">إلغاء</button>
+        <button type="submit" class="modal-save">حفظ</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="loginOverlay">
+  <div class="modal-box">
+    <h3 id="loginModalTitle">دخول الإدارة</h3>
+    <form id="loginForm">
+      <label>البريد الإلكتروني</label>
+      <input type="email" id="loginEmail" required>
+      <label>كلمة المرور</label>
+      <input type="password" id="loginPassword" required>
+      <div class="modal-actions">
+        <button type="button" class="modal-cancel" id="loginCancel">إلغاء</button>
+        <button type="submit" class="modal-save">دخول</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+/* ======================================================
+   CONFIG
+   ====================================================== */
+const SUPABASE_URL = "https://XXXXX.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
+let sb = null;
+try {
+  if (SUPABASE_URL.startsWith('http') && typeof window.supabase !== 'undefined') {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+} catch(e) { console.error(e); }
+
+/* ======================================================
+   TRANSLATIONS
+   ====================================================== */
+const T = {
+  admin_title:{ar:'لوحة الإدارة',fr:'Panneau admin',en:'Admin panel'},
+  admin_sub:{ar:'أضيفي وعدّلي واحذفي المنتجات لكل مشروع',fr:'Gérez les produits de chaque entreprise',en:'Manage products for each business'},
+  admin_login:{ar:'دخول الإدارة',fr:'Connexion admin',en:'Admin Login'},
+  admin_logout:{ar:'تسجيل الخروج',fr:'Déconnexion',en:'Logout'},
+  admin_add_product:{ar:'إضافة منتج',fr:'Ajouter produit',en:'Add product'},
+  admin_products:{ar:'المنتجات',fr:'Produits',en:'Products'},
+  admin_articles:{ar:'المقالات',fr:'Articles',en:'Articles'},
+  admin_add_article:{ar:'إضافة مقال',fr:'Ajouter article',en:'Add article'},
+  back_to_platform:{ar:'العودة للمنصة',fr:'Retour à la plateforme',en:'Back to platform'}
+};
+
+/* ======================================================
+   BUSINESS DATA
+   ====================================================== */
+const BIZ = {
+  mercerie: {
+    id:'mercerie', emoji:'✂️',
+    name:{ar:'ميمو مرسيري',fr:'M Mercerie',en:'M Mercerie'},
+    table_products:'mercerie_products', table_articles:'mercerie_articles',
+    storage_bucket:'mimo-images'
+  },
+  rental: {
+    id:'rental', emoji:'💒',
+    name:{ar:'ميمو أفراح',fr:'M Afrah',en:'M Afrah'},
+    table_products:'rental_items', table_articles:'rental_articles',
+    storage_bucket:'rental-images'
+  },
+  patisserie: {
+    id:'patisserie', emoji:'🎂',
+    name:{ar:'ميمو كيك',fr:'M Cake',en:'M Cake'},
+    table_products:'patisserie_products', table_articles:'patisserie_articles',
+    storage_bucket:'cake-images'
+  }
+};
+
+/* ======================================================
+   STATE
+   ====================================================== */
+let adminBiz='mercerie', isAdmin=false;
+let allData={mercerie:{products:[],articles:[]},rental:{products:[],articles:[]},patisserie:{products:[],articles:[]}};
+let currentLang='ar', currentType='product', currentId=null, currentImageFile=null, currentImageUrl=null;
+
+/* ======================================================
+   LANGUAGE
+   ====================================================== */
+function applyLanguage(lang){
+  currentLang=lang;
+  document.getElementById('adminTitle').textContent=T.admin_title[lang];
+  document.getElementById('adminSub').textContent=T.admin_sub[lang];
+  document.getElementById('loginModalTitle').textContent=T.admin_login[lang];
+  document.getElementById('adminLoginBtn').textContent=T.admin_login[lang];
+  document.querySelector('.admin-topbar-right a').textContent=T.back_to_platform[lang];
+  html.setAttribute('lang',lang);
+  html.setAttribute('dir',lang==='ar'?'rtl':'ltr');
+  renderAdminTabs();
+  renderAdminGrid();
+}
+const html=document.documentElement;
+document.getElementById('langSwitch').addEventListener('change',e=>applyLanguage(e.target.value));
+
+/* ======================================================
+   THEME
+   ====================================================== */
+function setTheme(m){html.setAttribute('data-theme',m);document.getElementById('themeIcon').innerHTML=m==='dark'?'<path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle cx="12" cy="12" r="4"/>':'<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';}
+setTheme('dark');
+document.getElementById('themeToggle').addEventListener('click',()=>setTheme(html.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+/* ======================================================
+   DATA LOADING
+   ====================================================== */
+async function loadData(bizId) {
+  if(!sb) return;
+  const b=BIZ[bizId];
+  try {
+    const [p,a] = await Promise.all([
+      sb.from(b.table_products).select('*').order('created_at',{ascending:true}),
+      sb.from(b.table_articles).select('*').order('created_at',{ascending:true})
+    ]);
+    allData[bizId].products=p.data||[];
+    allData[bizId].articles=a.data||[];
+  } catch(e) { console.error(`Load ${bizId}:`,e); }
+}
+async function loadAllData() { if(!sb) return; await Promise.all(['mercerie','rental','patisserie'].map(loadData)); }
+
+/* ======================================================
+   ADMIN RENDER
+   ====================================================== */
+function renderAdminTabs() {
+  document.getElementById('adminBizTabs').innerHTML = Object.values(BIZ).map(b=>
+    `<button class="admin-biz-tab ${adminBiz===b.id?'active':''}" onclick="adminBiz='${b.id}';renderAdminTabs();renderAdminGrid();">${b.emoji} ${b.name[currentLang]}</button>`
+  ).join('');
+}
+
+function renderAdminGrid() {
+  const b=BIZ[adminBiz], prods=allData[adminBiz].products, arts=allData[adminBiz].articles;
+  document.getElementById('adminGrid').innerHTML = `
+    <div class="admin-panel">
+      <h3>${T.admin_products[currentLang]} <span class="count">${prods.length}</span></h3>
+      <button class="admin-add-btn" onclick="openAddModal('product')">${T.admin_add_product[currentLang]}</button>
+      ${prods.map(p=>`<div class="admin-item"><div class="admin-item-info"><h4>${p.title}</h4><span>${p.price||''}</span></div><div class="admin-item-actions"><button class="edit-btn" onclick="openEditModal('product','${p.id}')">✎</button><button class="delete-btn" onclick="deleteItem('product','${p.id}')">🗑</button></div></div>`).join('')||`<p style="color:var(--text-muted);font-size:.85rem;padding:16px 0;">${currentLang==='ar'?'لا توجد منتجات':currentLang==='fr'?'Aucun produit':'No products'}</p>`}
+    </div>
+    <div class="admin-panel">
+      <h3>${T.admin_articles[currentLang]} <span class="count">${arts.length}</span></h3>
+      <button class="admin-add-btn" onclick="openAddModal('article')">${T.admin_add_article[currentLang]}</button>
+      ${arts.map(a=>`<div class="admin-item"><div class="admin-item-info"><h4>${a.title}</h4><span>${a.tag||''}</span></div><div class="admin-item-actions"><button class="edit-btn" onclick="openEditModal('article','${a.id}')">✎</button><button class="delete-btn" onclick="deleteItem('article','${a.id}')">🗑</button></div></div>`).join('')||`<p style="color:var(--text-muted);font-size:.85rem;padding:16px 0;">${currentLang==='ar'?'لا توجد مقالات':currentLang==='fr'?'Aucun article':'No articles'}</p>`}
+    </div>`;
+}
+
+/* ======================================================
+   AUTH
+   ====================================================== */
+function openLoginModal(){document.getElementById('loginOverlay').classList.add('open');}
+function closeLoginModal(){document.getElementById('loginOverlay').classList.remove('open');}
+document.getElementById('loginCancel').addEventListener('click',closeLoginModal);
+document.getElementById('loginOverlay').addEventListener('click',e=>{if(e.target.id==='loginOverlay')closeLoginModal();});
+document.getElementById('loginForm').addEventListener('submit',async e=>{
+  e.preventDefault(); if(!sb){alert('يرجى ربط قاعدة البيانات أولًا');return;}
+  const {error}=await sb.auth.signInWithPassword({email:document.getElementById('loginEmail').value,password:document.getElementById('loginPassword').value});
+  if(error){alert('خطأ: '+error.message);return;}
+  isAdmin=true; closeLoginModal(); showAdminContent();
+});
+async function logout(){if(sb)await sb.auth.signOut();isAdmin=false;hideAdminContent();}
+
+function showAdminContent(){
+  const lp=document.getElementById('adminLoginPrompt'), ct=document.getElementById('adminContent');
+  lp.innerHTML=`<button class="product-btn" onclick="logout()">${T.admin_logout[currentLang]}</button>`;
+  ct.classList.remove('hidden');
+  renderAdminTabs(); renderAdminGrid();
+}
+function hideAdminContent(){
+  const lp=document.getElementById('adminLoginPrompt'), ct=document.getElementById('adminContent');
+  lp.innerHTML=`<button class="product-btn" onclick="openLoginModal()">${T.admin_login[currentLang]}</button>`;
+  ct.classList.add('hidden');
+}
+document.getElementById('adminLoginBtn').addEventListener('click',openLoginModal);
+
+/* ======================================================
+   ITEM MODALS
+   ====================================================== */
+function openAddModal(type){
+  currentType=type;currentId=null;currentImageFile=null;currentImageUrl=null;
+  document.getElementById('fieldImage').value='';
+  document.getElementById('modalTitle').textContent=type==='product'?'إضافة منتج':'إضافة مقال';
+  document.getElementById('labelPrice').style.display=type==='product'?'':'none';
+  document.getElementById('fieldPrice').style.display=type==='product'?'':'none';
+  document.getElementById('labelTag').style.display=type==='article'?'':'none';
+  document.getElementById('fieldTag').style.display=type==='article'?'':'none';
+  ['fieldTitle','fieldPrice','fieldTag','fieldDesc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function openEditModal(type,id){
+  currentType=type;currentId=id;currentImageFile=null;
+  const items=type==='product'?allData[adminBiz].products:allData[adminBiz].articles;
+  const item=items.find(x=>x.id===id); if(!item) return;
+  currentImageUrl=item.image_url||null;
+  document.getElementById('modalTitle').textContent=type==='product'?'تعديل منتج':'تعديل مقال';
+  document.getElementById('labelPrice').style.display=type==='product'?'':'none';
+  document.getElementById('fieldPrice').style.display=type==='product'?'':'none';
+  document.getElementById('labelTag').style.display=type==='article'?'':'none';
+  document.getElementById('fieldTag').style.display=type==='article'?'':'none';
+  document.getElementById('fieldTitle').value=item.title||'';
+  document.getElementById('fieldPrice').value=item.price||'';
+  document.getElementById('fieldTag').value=item.tag||'';
+  document.getElementById('fieldDesc').value=item.description||'';
+  document.getElementById('fieldImage').value='';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');}
+document.getElementById('modalCancel').addEventListener('click',closeModal);
+document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target.id==='modalOverlay')closeModal();});
+document.getElementById('fieldImage').addEventListener('change',()=>{currentImageFile=document.getElementById('fieldImage').files[0]||null;});
+
+async function uploadImage(){
+  if(!currentImageFile||!sb) return currentImageUrl;
+  const b=BIZ[adminBiz], path=`${Date.now()}_${currentImageFile.name}`;
+  const {error}=await sb.storage.from(b.storage_bucket).upload(path,currentImageFile);
+  if(error){alert('خطأ أثناء رفع الصورة: '+error.message);return currentImageUrl;}
+  const {data}=sb.storage.from(b.storage_bucket).getPublicUrl(path);
+  return data.publicUrl;
+}
+
+document.getElementById('itemForm').addEventListener('submit',async e=>{
+  e.preventDefault(); if(!sb){alert('يرجى ربط قاعدة البيانات أولًا');return;}
+  const b=BIZ[adminBiz], btn=e.target.querySelector('.modal-save');
+  btn.textContent='...'; btn.disabled=true;
+  try {
+    const imageUrl=await uploadImage();
+    if(currentType==='product'){
+      const p={title:document.getElementById('fieldTitle').value,price:document.getElementById('fieldPrice').value,image_url:imageUrl};
+      currentId?await sb.from(b.table_products).update(p).eq('id',currentId):await sb.from(b.table_products).insert(p);
+    } else {
+      const p={title:document.getElementById('fieldTitle').value,tag:document.getElementById('fieldTag').value,description:document.getElementById('fieldDesc').value,image_url:imageUrl};
+      currentId?await sb.from(b.table_articles).update(p).eq('id',currentId):await sb.from(b.table_articles).insert(p);
+    }
+    await loadData(adminBiz); closeModal(); renderAdminGrid();
+  } catch(err){alert('خطأ');console.error(err);}
+  finally{btn.textContent='حفظ';btn.disabled=false;}
+});
+
+async function deleteItem(type,id){
+  if(!confirm('هل أنتِ متأكدة من الحذف؟')) return;
+  const b=BIZ[adminBiz], table=type==='product'?b.table_products:b.table_articles;
+  await sb.from(table).delete().eq('id',id);
+  await loadData(adminBiz); renderAdminGrid();
+}
+
+/* ======================================================
+   INIT
+   ====================================================== */
+(async function init(){
+  await loadAllData();
+  renderAdminTabs();
+  renderAdminGrid();
+})();
+</script>
+</body>
+</html>

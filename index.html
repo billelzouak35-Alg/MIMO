@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ميمو منصتي — كل ما تحتاجينه في مكان واحد</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ======================================================
+   PLATFORM V2 — MODERN MINIMAL DESIGN
+   ====================================================== */
+:root {
+  /* Core palette */
+  --bg: #0A0A0F;
+  --bg-card: #141419;
+  --bg-elevated: #1C1C24;
+  --bg-glass: rgba(20,20,25,.72);
+  --surface: #1E1E28;
+  --border: rgba(255,255,255,.06);
+  --border-hover: rgba(255,255,255,.12);
+  --text: #F0EFF4;
+  --text-secondary: #8B8A94;
+  --text-muted: #5A5968;
+  /* Accent colors per business */
+  --accent: #6C5CE7;
+  --accent-2: #A29BFE;
+  --accent-glow: rgba(108,92,231,.25);
+  --success: #00D2A0;
+  --warning: #FDCB6E;
+  --danger: #FF6B6B;
+  --info: #74B9FF;
+  /* Business accent overrides */
+  --biz-mercerie: #E84393;
+  --biz-mercerie-glow: rgba(232,67,147,.2);
+  --biz-rental: #FDCB6E;
+  --biz-rental-glow: rgba(253,203,110,.2);
+  --biz-patisserie: #FF7675;
+  --biz-patisserie-glow: rgba(255,118,117,.2);
+  /* Spacing */
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-xl: 32px;
+  --r-full: 100px;
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.3);
+  --shadow-md: 0 8px 32px rgba(0,0,0,.4);
+  --shadow-lg: 0 16px 64px rgba(0,0,0,.5);
+  --shadow-glow: 0 0 40px var(--accent-glow);
+  /* Fonts */
+  --font-ar: 'IBM Plex Sans Arabic', sans-serif;
+  --font-en: 'Space Grotesk', 'Inter', sans-serif;
+}
+
+/* Light theme */
+html[data-theme="light"] {
+  --bg: #F5F5F7;
+  --bg-card: #FFFFFF;
+  --bg-elevated: #FFFFFF;
+  --bg-glass: rgba(255,255,255,.82);
+  --surface: #F0F0F2;
+  --border: rgba(0,0,0,.06);
+  --border-hover: rgba(0,0,0,.12);
+  --text: #1A1A2E;
+  --text-secondary: #6B6B80;
+  --text-muted: #9B9BAD;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.06);
+  --shadow-md: 0 8px 32px rgba(0,0,0,.08);
+  --shadow-lg: 0 16px 64px rgba(0,0,0,.1);
+  --accent-glow: rgba(108,92,231,.12);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family: var(--font-ar);
+  background: var(--bg);
+  color: var(--text);
+  line-height:1.7;
+  overflow-x:hidden;
+  min-height:100vh;
+}
+h1,h2,h3,h4 { font-family: var(--font-ar); font-weight:700; }
+a { text-decoration:none; color:inherit; }
+button { font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; }
+img { max-width:100%; display:block; }
+.hidden { display:none !important; }
+@media(prefers-reduced-motion:reduce){*{animation-duration:.001s!important;transition-duration:.001s!important;}}
+
+/* ======================================================
+   ANIMATED BACKGROUND
+   ====================================================== */
+.bg-orbs {
+  position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+}
+.bg-orb {
+  position:absolute; border-radius:50%; filter:blur(120px); opacity:.15;
+  animation: orbFloat 20s ease-in-out infinite;
+}
+.bg-orb:nth-child(1){ width:600px;height:600px;background:var(--accent);top:-10%;right:-5%;animation-delay:0s; }
+.bg-orb:nth-child(2){ width:500px;height:500px;background:var(--biz-mercerie);bottom:-10%;left:-5%;animation-delay:-7s; }
+.bg-orb:nth-child(3){ width:400px;height:400px;background:var(--success);top:40%;left:40%;animation-delay:-14s; }
+@keyframes orbFloat {
+  0%,100%{transform:translate(0,0) scale(1)}
+  33%{transform:translate(30px,-40px) scale(1.1)}
+  66%{transform:translate(-20px,30px) scale(.9)}
+}
+
+/* ======================================================
+   TOPBAR
+   ====================================================== */
+.topbar {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  height:64px; padding:0 24px;
+  display:flex; align-items:center; justify-content:space-between;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px) saturate(1.4);
+  border-bottom:1px solid var(--border);
+}
+.topbar-logo {
+  display:flex; align-items:center; gap:10px;
+  font-weight:700; font-size:1.1rem; color:var(--text);
+}
+.topbar-logo .logo-icon {
+  width:auto; height:36px; padding:0 12px; border-radius:var(--r-sm);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  display:flex; align-items:center; justify-content:center;
+  font-size:.75rem; color:#fff; font-weight:800; letter-spacing:1px;
+  transition:all .3s;
+}
+.topbar-logo:hover .logo-icon { transform:scale(1.08); }
+.topbar-nav {
+  display:flex; align-items:center; gap:6px;
+  background: var(--surface);
+  border-radius: var(--r-full);
+  padding:4px;
+  border:1px solid var(--border);
+}
+.topbar-nav button {
+  padding:8px 20px; border-radius:var(--r-full);
+  font-size:.85rem; font-weight:600;
+  color: var(--text-secondary);
+  transition: all .25s ease;
+  white-space:nowrap;
+}
+.topbar-nav button:hover { color:var(--text); background:rgba(255,255,255,.05); }
+.topbar-nav button.active {
+  background: var(--accent);
+  color:#fff;
+  box-shadow: 0 2px 12px var(--accent-glow);
+}
+.topbar-actions {
+  display:flex; align-items:center; gap:10px;
+}
+.lang-select {
+  appearance:none; -webkit-appearance:none;
+  background: var(--surface); border:1px solid var(--border);
+  color: var(--text); border-radius:var(--r-full);
+  padding:8px 32px 8px 14px; font-size:.8rem; font-weight:600;
+  font-family:inherit; cursor:pointer;
+  position:relative;
+}
+.lang-switch { position:relative; }
+.lang-switch::after {
+  content:'▾'; position:absolute; left:12px; top:50%; transform:translateY(-50%);
+  color:var(--text-muted); font-size:.65rem; pointer-events:none;
+}
+.theme-btn {
+  width:38px; height:38px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--surface); border:1px solid var(--border);
+  color: var(--text-secondary);
+  transition: all .25s;
+}
+.theme-btn:hover { color:var(--accent); transform:rotate(15deg); }
+.theme-btn svg { width:18px; height:18px; }
+.burger { display:none; font-size:1.4rem; }
+
+/* ======================================================
+   MOBILE NAV
+   ====================================================== */
+.mobile-nav {
+  position:fixed; top:0; right:-100%; width:80%; max-width:340px; height:100vh;
+  background: var(--bg-elevated); z-index:200;
+  box-shadow: var(--shadow-lg);
+  padding:30px 24px; transition: right .35s cubic-bezier(.4,0,.2,1);
+  display:flex; flex-direction:column; gap:8px;
+  border-left:1px solid var(--border);
+}
+.mobile-nav.open { right:0; }
+.mobile-nav .close-btn { align-self:flex-end; font-size:1.4rem; color:var(--text-muted); padding:8px; }
+.mobile-nav a {
+  padding:14px 16px; border-radius:var(--r-md);
+  font-weight:600; font-size:1rem; color:var(--text-secondary);
+  transition: all .2s;
+}
+.mobile-nav a:hover, .mobile-nav a.active { color:var(--text); background:var(--surface); }
+.overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:190;
+  opacity:0; pointer-events:none; transition:opacity .3s;
+  backdrop-filter:blur(4px);
+}
+.overlay.open { opacity:1; pointer-events:auto; }
+
+/* ======================================================
+   FLOATING WHATSAPP
+   ====================================================== */
+.float-wa {
+  position:fixed; bottom:28px; left:28px; z-index:150;
+  width:60px; height:60px; border-radius:50%;
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: 0 8px 30px rgba(37,211,102,.4);
+  transition: transform .3s, box-shadow .3s;
+}
+.float-wa:hover { transform:scale(1.1); box-shadow: 0 12px 40px rgba(37,211,102,.5); }
+.float-wa svg { width:28px; height:28px; fill:#fff; }
+
+/* ======================================================
+   PAGE WRAPPER
+   ====================================================== */
+.page { padding-top:64px; min-height:100vh; position:relative; z-index:1; }
+
+/* ======================================================
+   DASHBOARD — HOME
+   ====================================================== */
+.dash-hero {
+  padding:80px 5vw 60px;
+  display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center;
+  min-height:calc(100vh - 64px);
+}
+.dash-hero-text h1 {
+  font-size:clamp(2.2rem,5vw,3.6rem);
+  line-height:1.25; margin-bottom:20px;
+  background: linear-gradient(135deg, var(--text) 0%, var(--text-secondary) 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.dash-hero-text h1 span {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.dash-hero-text p { color:var(--text-secondary); font-size:1.1rem; max-width:480px; margin-bottom:32px; }
+.dash-hero-visual {
+  display:flex; align-items:center; justify-content:center;
+  position:relative;
+}
+.dash-hero-visual .orbit {
+  width:380px; height:380px; border-radius:50%;
+  position:relative;
+}
+.orbit-ring {
+  position:absolute; top:50%; left:50%; border-radius:50%;
+  border:1px dashed var(--border); opacity:.4;
+}
+.orbit-ring.ring-1 { width:380px; height:380px; margin:-190px 0 0 -190px; }
+.orbit-ring.ring-2 { width:280px; height:280px; margin:-140px 0 0 -140px; border-style:dotted; opacity:.25; }
+.orbit-dot {
+  position:absolute; width:72px; height:72px; border-radius:50%;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-size:1.5rem; cursor:pointer; z-index:2;
+  box-shadow:var(--shadow-md);
+  transition:all .3s;
+}
+.orbit-dot:hover { transform:scale(1.15); }
+.orbit-dot .dot-emoji { line-height:1; }
+.orbit-dot .dot-label {
+  font-size:.6rem; font-weight:700; margin-top:2px;
+  white-space:nowrap; opacity:.85;
+}
+.dot-mercerie {
+  top:-36px; left:50%; margin-left:-36px;
+  background:var(--biz-mercerie); color:var(--biz-mercerie-text,#fff);
+  animation:float-y 6s ease-in-out infinite;
+}
+.dot-rental {
+  bottom:18px; left:-18px;
+  background:var(--biz-rental); color:var(--biz-rental-text,#fff);
+  animation:float-y 6s ease-in-out infinite 2s;
+}
+.dot-patisserie {
+  bottom:18px; right:-18px;
+  background:var(--biz-patisserie); color:var(--biz-patisserie-text,#fff);
+  animation:float-y 6s ease-in-out infinite 4s;
+}
+.dot-fb {
+  top:50%; left:-30px; margin-top:-28px;
+  background:#1877F2; color:#fff;
+  width:56px; height:56px;
+  animation:float-y 5s ease-in-out infinite 1s;
+}
+.dot-fb svg { width:22px; height:22px; }
+.dot-insta {
+  top:-20px; right:-10px;
+  background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); color:#fff;
+  width:56px; height:56px;
+  animation:float-y 5s ease-in-out infinite 2.5s;
+}
+.dot-insta svg { width:22px; height:22px; }
+.dot-tiktok {
+  bottom:-10px; left:50%; margin-left:-28px;
+  background:#010101; color:#fff;
+  width:52px; height:52px;
+  animation:float-y 5s ease-in-out infinite 3.5s;
+}
+.dot-tiktok svg { width:20px; height:20px; }
+.dot-youtube {
+  top:50%; right:-30px; margin-top:-28px;
+  background:#FF0000; color:#fff;
+  width:56px; height:56px;
+  animation:float-y 5s ease-in-out infinite 0.5s;
+}
+.dot-youtube svg { width:22px; height:22px; }
+@keyframes float-y {
+  0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)}
+}
+.orbit-center {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:100px; height:100px; border-radius:50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.2rem; color:#fff; font-weight:800; letter-spacing:1px;
+  box-shadow: var(--shadow-glow);
+  z-index:3;
+}
+.orbit-center::after {
+  content:''; position:absolute; inset:-4px; border-radius:50%;
+  border:2px solid var(--accent); opacity:.3;
+  animation:pulse-ring 3s ease-in-out infinite;
+}
+@keyframes pulse-ring {
+  0%,100%{transform:scale(1);opacity:.3} 50%{transform:scale(1.08);opacity:.15}
+}
+
+/* Stats bar */
+.stats-bar {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:20px;
+  padding:0 5vw 60px;
+}
+.stat-card {
+  background: var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:var(--r-lg);
+  padding:28px 24px;
+  transition: all .3s;
+}
+.stat-card:hover { border-color:var(--border-hover); transform:translateY(-2px); }
+.stat-card .stat-label { font-size:.82rem; color:var(--text-muted); font-weight:500; margin-bottom:8px; }
+.stat-card .stat-value { font-size:1.8rem; font-weight:700; color:var(--text); }
+.stat-card .stat-change { font-size:.78rem; color:var(--success); font-weight:600; margin-top:4px; }
+
+/* Business cards */
+.biz-section { padding:40px 5vw 80px; }
+.biz-section-header { margin-bottom:40px; }
+.biz-section-header h2 { font-size:1.6rem; margin-bottom:6px; }
+.biz-section-header p { color:var(--text-secondary); font-size:.95rem; }
+.biz-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+.biz-card {
+  background: var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:var(--r-xl);
+  overflow:hidden;
+  transition: all .4s cubic-bezier(.4,0,.2,1);
+  cursor:pointer;
+  position:relative;
+}
+.biz-card::before {
+  content:''; position:absolute; inset:0;
+  background: linear-gradient(135deg, transparent 60%, var(--accent-glow));
+  opacity:0; transition:opacity .4s;
+}
+.biz-card:hover { border-color:var(--border-hover); transform:translateY(-6px); box-shadow:var(--shadow-lg); }
+.biz-card:hover::before { opacity:1; }
+.biz-card-header {
+  height:180px; position:relative; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+}
+.biz-card-header .biz-bg {
+  position:absolute; inset:0; opacity:.12;
+}
+.biz-card-header .biz-icon {
+  width:80px; height:80px; border-radius:var(--r-lg);
+  display:flex; align-items:center; justify-content:center;
+  font-size:2.2rem; position:relative; z-index:1;
+  box-shadow: var(--shadow-md);
+}
+.biz-card[data-biz="mercerie"] .biz-icon { background: linear-gradient(135deg, #E84393, #FD79A8); }
+.biz-card[data-biz="mercerie"] .biz-bg { background: linear-gradient(135deg, #E84393, #FD79A8); }
+.biz-card[data-biz="rental"] .biz-icon { background: linear-gradient(135deg, #FDCB6E, #F39C12); }
+.biz-card[data-biz="rental"] .biz-bg { background: linear-gradient(135deg, #FDCB6E, #F39C12); }
+.biz-card[data-biz="patisserie"] .biz-icon { background: linear-gradient(135deg, #FF7675, #D63031); }
+.biz-card[data-biz="patisserie"] .biz-bg { background: linear-gradient(135deg, #FF7675, #D63031); }
+.biz-card-body { padding:28px; position:relative; z-index:1; }
+.biz-card-body h3 { font-size:1.25rem; margin-bottom:6px; }
+.biz-card-body p { color:var(--text-secondary); font-size:.9rem; margin-bottom:16px; line-height:1.6; }
+.biz-card-meta {
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+}
+.biz-tag {
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:.75rem; font-weight:600; padding:5px 12px;
+  border-radius:var(--r-full);
+  background: var(--surface); color:var(--text-secondary);
+  border:1px solid var(--border);
+}
+.biz-card-arrow {
+  position:absolute; bottom:28px; left:28px;
+  width:40px; height:40px; border-radius:50%;
+  background: var(--accent);
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; font-size:1.1rem;
+  transition: transform .3s;
+}
+[dir="ltr"] .biz-card-arrow { left:auto; right:28px; }
+.biz-card:hover .biz-card-arrow { transform:translateX(-4px); }
+[dir="ltr"] .biz-card:hover .biz-card-arrow { transform:translateX(4px); }
+
+/* ======================================================
+   STORE PAGE
+   ====================================================== */
+.store-header {
+  padding:50px 5vw 40px;
+  text-align:center;
+  position:relative;
+}
+.store-header::after {
+  content:''; position:absolute; bottom:0; left:10%; right:10%; height:1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+}
+.back-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:8px 18px; border-radius:var(--r-full);
+  background:var(--surface); border:1px solid var(--border);
+  font-size:.85rem; font-weight:600; color:var(--text-secondary);
+  transition: all .25s; margin-bottom:20px;
+}
+.back-btn:hover { color:var(--text); border-color:var(--border-hover); }
+.store-header h1 { font-size:clamp(1.8rem,4vw,2.8rem); margin-bottom:10px; }
+.store-header p { color:var(--text-secondary); font-size:1.05rem; max-width:560px; margin:0 auto; }
+
+/* Store trust pills */
+.store-pills {
+  display:flex; justify-content:center; flex-wrap:wrap; gap:12px;
+  padding:30px 5vw;
+}
+.pill {
+  display:flex; align-items:center; gap:8px;
+  padding:10px 20px; border-radius:var(--r-full);
+  background: var(--bg-card); border:1px solid var(--border);
+  font-size:.85rem; font-weight:600; color:var(--text-secondary);
+  transition: all .25s;
+}
+.pill:hover { border-color:var(--accent); color:var(--accent); }
+.pill .pill-dot {
+  width:8px; height:8px; border-radius:50%; background:var(--accent);
+}
+
+/* Categories grid */
+.store-section { padding:60px 5vw; }
+.contact-section { padding-bottom:100px; }
+.store-section-header { text-align:center; margin-bottom:40px; }
+.store-section-header h2 { font-size:1.5rem; margin-bottom:6px; }
+.store-section-header p { color:var(--text-secondary); font-size:.92rem; }
+.cats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+.cat-card {
+  background: var(--bg-card); border:1px solid var(--border);
+  border-radius:var(--r-lg); padding:32px 20px;
+  text-align:center; transition:all .3s;
+  cursor:pointer; position:relative; overflow:hidden;
+}
+.cat-card::before {
+  content:''; position:absolute; inset:0;
+  background: linear-gradient(180deg, transparent 50%, var(--accent-glow));
+  opacity:0; transition:opacity .3s;
+}
+.cat-card:hover { border-color:var(--border-hover); transform:translateY(-4px); }
+.cat-card:hover::before { opacity:1; }
+.cat-card .cat-icon {
+  width:56px; height:56px; border-radius:var(--r-md);
+  background: var(--surface); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  margin:0 auto 16px; font-size:1.5rem; position:relative; z-index:1;
+}
+.cat-card h3 { font-size:1.05rem; margin-bottom:4px; position:relative; z-index:1; }
+.cat-card span { font-size:.82rem; color:var(--text-muted); position:relative; z-index:1; }
+
+/* Products grid */
+.products-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+.product-card {
+  background: var(--bg-card); border:1px solid var(--border);
+  border-radius:var(--r-lg); overflow:hidden;
+  transition:all .3s; position:relative;
+}
+.product-card:hover { border-color:var(--border-hover); transform:translateY(-4px); box-shadow:var(--shadow-md); }
+.product-img {
+  height:200px; display:flex; align-items:center; justify-content:center;
+  background: var(--surface); overflow:hidden;
+}
+.product-img img { width:100%; height:100%; object-fit:cover; }
+.product-img .placeholder-icon { font-size:3rem; opacity:.3; }
+.product-body { padding:22px; }
+.product-body h3 { font-size:1.05rem; margin-bottom:6px; }
+.product-body .price { color:var(--accent); font-weight:700; font-size:1.1rem; margin-bottom:14px; display:block; }
+.product-btn {
+  display:block; text-align:center;
+  padding:12px; border-radius:var(--r-md);
+  background:var(--accent); color:#fff;
+  font-weight:600; font-size:.9rem;
+  transition:all .25s;
+}
+.product-btn:hover { opacity:.9; transform:translateY(-1px); }
+
+/* Testimonials */
+.test-section { background:var(--surface); border-radius:var(--r-xl); margin:0 5vw; padding:60px; }
+.test-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+.test-card {
+  background:var(--bg-card); border:1px solid var(--border);
+  border-radius:var(--r-lg); padding:28px;
+  transition:all .3s;
+}
+.test-card:hover { border-color:var(--border-hover); }
+.test-stars { color:var(--warning); margin-bottom:12px; font-size:.9rem; letter-spacing:2px; }
+.test-card p { font-size:.92rem; color:var(--text-secondary); margin-bottom:16px; line-height:1.7; }
+.test-who {
+  display:flex; align-items:center; gap:10px;
+  font-weight:600; font-size:.88rem;
+}
+.test-avatar {
+  width:36px; height:36px; border-radius:50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; font-size:.85rem; font-weight:700;
+}
+
+/* About */
+.about-row { display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; padding:60px 5vw; }
+.about-visual {
+  display:flex; align-items:center; justify-content:center;
+}
+.about-visual .about-shape {
+  width:280px; height:280px; border-radius:50%;
+  background: linear-gradient(135deg, var(--accent-glow), transparent);
+  border:1px dashed var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-size:4rem;
+}
+.about-text h2 { font-size:1.6rem; margin-bottom:16px; }
+.about-text p { color:var(--text-secondary); font-size:1rem; line-height:1.8; }
+
+/* FAQ */
+.faq-list { max-width:700px; margin:0 auto; }
+.faq-item {
+  background:var(--bg-card); border:1px solid var(--border);
+  border-radius:var(--r-md); margin-bottom:12px;
+  overflow:hidden; transition:all .3s;
+}
+.faq-item:hover { border-color:var(--border-hover); }
+.faq-item summary {
+  cursor:pointer; font-weight:600; padding:18px 24px;
+  list-style:none; display:flex; justify-content:space-between; align-items:center;
+  color:var(--text);
+}
+.faq-item summary::-webkit-details-marker { display:none; }
+.faq-item summary::after {
+  content:'+'; font-size:1.3rem; color:var(--accent);
+  transition:transform .3s;
+}
+.faq-item[open] summary::after { transform:rotate(45deg); }
+.faq-item .faq-body { padding:0 24px 18px; color:var(--text-secondary); font-size:.92rem; }
+
+/* Contact */
+.contact-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:0;
+  background:var(--bg-card); border:1px solid var(--border);
+  border-radius:var(--r-xl); overflow:hidden;
+  margin:0 5vw;
+}
+.contact-info {
+  background: linear-gradient(160deg, var(--accent), var(--accent-2));
+  padding:48px 36px; display:flex; flex-direction:column; justify-content:center; gap:20px;
+  color:#fff;
+}
+.contact-info h2 { font-size:1.6rem; color:#fff; }
+.contact-info p { opacity:.85; font-size:.95rem; }
+.contact-row { display:flex; align-items:center; gap:12px; font-weight:600; font-size:.95rem; }
+.wa-btn-contact {
+  margin-top:12px; background:rgba(255,255,255,.2); color:#fff;
+  padding:14px 24px; border-radius:var(--r-full);
+  font-weight:700; text-align:center; display:inline-flex;
+  align-items:center; gap:8px; transition:all .25s;
+  backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,.2);
+}
+.wa-btn-contact:hover { background:rgba(255,255,255,.3); transform:translateY(-2px); }
+.contact-form-side { padding:48px 36px; display:flex; flex-direction:column; gap:14px; }
+.contact-form-side input, .contact-form-side textarea {
+  padding:14px 18px; border:1px solid var(--border);
+  border-radius:var(--r-md); background:var(--surface);
+  color:var(--text); font-family:inherit; font-size:.95rem;
+  transition:border-color .2s, box-shadow .2s;
+}
+.contact-form-side input:focus, .contact-form-side textarea:focus {
+  border-color:var(--accent); outline:none;
+  box-shadow:0 0 0 3px var(--accent-glow);
+}
+.contact-form-side textarea { resize:vertical; min-height:100px; }
+.submit-btn {
+  background:linear-gradient(135deg, var(--accent), var(--accent-2));
+  color:#fff; padding:14px; border-radius:var(--r-md);
+  font-weight:700; font-size:.95rem;
+  transition:all .25s; box-shadow:0 4px 20px var(--accent-glow);
+}
+.submit-btn:hover { transform:translateY(-2px); box-shadow:0 8px 30px var(--accent-glow); }
+
+/* ======================================================
+   FOOTER
+   ====================================================== */
+.site-footer {
+  padding:48px 5vw 28px; text-align:center;
+  border-top:1px solid var(--border);
+  position:relative; z-index:1;
+}
+.footer-logo {
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  font-size:1rem; font-weight:700; margin-bottom:16px;
+}
+.footer-logo .logo-icon {
+  width:auto; height:32px; padding:0 10px; border-radius:var(--r-sm);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  display:flex; align-items:center; justify-content:center;
+  font-size:.7rem; color:#fff; font-weight:800; letter-spacing:1px;
+}
+.footer-copy { color:var(--text-muted); font-size:.82rem; }
+
+/* ======================================================
+   CONVERSION — SOCIAL PROOF TOAST
+   ====================================================== */
+.social-proof {
+  position:fixed; bottom:100px; left:28px; z-index:160;
+  display:flex; align-items:center; gap:12px;
+  padding:14px 20px; border-radius:var(--r-lg);
+  background:var(--bg-card); border:1px solid var(--border);
+  box-shadow:var(--shadow-lg);
+  transform:translateX(-120%); opacity:0;
+  transition:all .5s cubic-bezier(.4,0,.2,1);
+  max-width:340px; pointer-events:none;
+}
+.social-proof.show { transform:translateX(0); opacity:1; pointer-events:auto; }
+.social-proof .sp-avatar {
+  width:42px; height:42px; border-radius:50%; flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.2rem;
+}
+.social-proof .sp-info { flex:1; }
+.social-proof .sp-info .sp-name { font-weight:700; font-size:.88rem; color:var(--text); }
+.social-proof .sp-info .sp-action { font-size:.78rem; color:var(--text-secondary); }
+.social-proof .sp-info .sp-time { font-size:.7rem; color:var(--text-muted); margin-top:2px; }
+.social-proof .sp-close { color:var(--text-muted); font-size:1rem; padding:4px; }
+
+/* ======================================================
+   CONVERSION — QUICK VIEW MODAL
+   ====================================================== */
+.qv-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,.7);
+  backdrop-filter:blur(12px); z-index:310;
+  display:flex; align-items:center; justify-content:center; padding:20px;
+  opacity:0; pointer-events:none; transition:opacity .3s;
+}
+.qv-overlay.open { opacity:1; pointer-events:auto; }
+.qv-box {
+  background:var(--bg-elevated); border:1px solid var(--border);
+  border-radius:var(--r-xl); max-width:560px; width:100%;
+  display:grid; grid-template-columns:1fr 1fr; overflow:hidden;
+  box-shadow:var(--shadow-lg);
+  transform:scale(.95); transition:transform .3s;
+}
+.qv-overlay.open .qv-box { transform:scale(1); }
+.qv-img {
+  background:var(--surface); display:flex; align-items:center; justify-content:center;
+  min-height:300px; overflow:hidden;
+}
+.qv-img img { width:100%; height:100%; object-fit:cover; }
+.qv-img .qv-placeholder { font-size:4rem; opacity:.3; }
+.qv-details { padding:32px; display:flex; flex-direction:column; gap:12px; }
+.qv-details .qv-badge {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:4px 12px; border-radius:var(--r-full);
+  font-size:.72rem; font-weight:700; width:fit-content;
+}
+.qv-badge.badge-hot { background:rgba(255,107,107,.15); color:var(--danger); }
+.qv-badge.badge-new { background:rgba(0,210,160,.15); color:var(--success); }
+.qv-badge.badge-limited { background:rgba(253,203,110,.15); color:var(--warning); }
+.qv-details h3 { font-size:1.3rem; }
+.qv-details .qv-price { font-size:1.5rem; font-weight:700; color:var(--accent); }
+.qv-details .qv-desc { font-size:.9rem; color:var(--text-secondary); line-height:1.7; }
+.qv-details .qv-stock { font-size:.82rem; color:var(--text-muted); display:flex; align-items:center; gap:6px; }
+.qv-details .qv-stock .stock-dot { width:8px; height:8px; border-radius:50%; }
+.qv-details .qv-stock .stock-dot.in-stock { background:var(--success); }
+.qv-details .qv-stock .stock-dot.low-stock { background:var(--warning); animation:pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.qv-actions { display:flex; gap:10px; margin-top:auto; }
+.qv-wa-btn {
+  flex:1; padding:14px; border-radius:var(--r-md);
+  background:linear-gradient(135deg,#25D366,#128C7E);
+  color:#fff; font-weight:700; font-size:.92rem;
+  text-align:center; display:flex; align-items:center; justify-content:center; gap:8px;
+  transition:all .25s;
+}
+.qv-wa-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(37,211,102,.3); }
+.qv-close {
+  position:absolute; top:16px; left:16px; width:36px; height:36px;
+  border-radius:50%; background:var(--bg-card); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--text-muted); font-size:1rem; z-index:2;
+  transition:all .2s;
+}
+.qv-close:hover { color:var(--text); border-color:var(--border-hover); }
+
+/* ======================================================
+   CONVERSION — STICKY MOBILE CTA
+   ====================================================== */
+.sticky-cta {
+  position:fixed; bottom:0; left:0; right:0; z-index:140;
+  padding:12px 20px; padding-bottom:max(12px, env(safe-area-inset-bottom));
+  background:var(--bg-glass); backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  display:none; align-items:center; gap:12px;
+}
+.sticky-cta.visible { display:flex; }
+.sticky-cta .cta-info { flex:1; }
+.sticky-cta .cta-info .cta-title { font-weight:700; font-size:.9rem; }
+.sticky-cta .cta-info .cta-sub { font-size:.75rem; color:var(--text-secondary); }
+.sticky-cta .cta-wa {
+  padding:12px 24px; border-radius:var(--r-full);
+  background:linear-gradient(135deg,#25D366,#128C7E);
+  color:#fff; font-weight:700; font-size:.88rem;
+  display:flex; align-items:center; gap:6px;
+  white-space:nowrap; transition:all .25s;
+}
+.sticky-cta .cta-wa:hover { transform:scale(1.03); }
+
+/* ======================================================
+   CONVERSION — TRUST BADGES
+   ====================================================== */
+.trust-badges {
+  display:flex; justify-content:center; flex-wrap:wrap; gap:16px;
+  padding:30px 5vw;
+}
+.trust-badge {
+  display:flex; align-items:center; gap:10px;
+  padding:16px 24px; border-radius:var(--r-lg);
+  background:var(--bg-card); border:1px solid var(--border);
+  transition:all .3s;
+}
+.trust-badge:hover { border-color:var(--accent); transform:translateY(-2px); }
+.trust-badge .tb-icon {
+  width:44px; height:44px; border-radius:var(--r-md);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.3rem;
+}
+.trust-badge .tb-icon.tb-green { background:rgba(0,210,160,.12); }
+.trust-badge .tb-icon.tb-blue { background:rgba(116,185,255,.12); }
+.trust-badge .tb-icon.tb-orange { background:rgba(253,203,110,.12); }
+.trust-badge .tb-icon.tb-pink { background:rgba(232,67,147,.12); }
+.trust-badge .tb-text h4 { font-size:.88rem; font-weight:700; }
+.trust-badge .tb-text p { font-size:.75rem; color:var(--text-muted); }
+
+/* ======================================================
+   CONVERSION — EXIT POPUP
+   ====================================================== */
+.exit-popup {
+  position:fixed; inset:0; background:rgba(0,0,0,.7);
+  backdrop-filter:blur(8px); z-index:320;
+  display:flex; align-items:center; justify-content:center; padding:20px;
+  opacity:0; pointer-events:none; transition:opacity .4s;
+}
+.exit-popup.show { opacity:1; pointer-events:auto; }
+.exit-box {
+  background:var(--bg-elevated); border:1px solid var(--border);
+  border-radius:var(--r-xl); padding:48px 40px; max-width:440px; width:100%;
+  text-align:center; position:relative;
+  box-shadow:var(--shadow-lg);
+  transform:scale(.9); transition:transform .4s cubic-bezier(.4,0,.2,1);
+}
+.exit-popup.show .exit-box { transform:scale(1); }
+.exit-box .exit-emoji { font-size:3.5rem; margin-bottom:16px; }
+.exit-box h3 { font-size:1.4rem; margin-bottom:10px; }
+.exit-box p { color:var(--text-secondary); font-size:.95rem; margin-bottom:24px; line-height:1.7; }
+.exit-box .exit-offer {
+  padding:16px; border-radius:var(--r-md);
+  background:linear-gradient(135deg,var(--accent-glow),rgba(0,210,160,.08));
+  border:1px dashed var(--accent);
+  margin-bottom:24px;
+}
+.exit-box .exit-offer .offer-text { font-size:.88rem; font-weight:700; color:var(--accent); }
+.exit-box .exit-actions { display:flex; gap:12px; justify-content:center; }
+.exit-box .exit-actions .exit-wa {
+  padding:14px 32px; border-radius:var(--r-full);
+  background:linear-gradient(135deg,#25D366,#128C7E);
+  color:#fff; font-weight:700; font-size:.95rem;
+  display:flex; align-items:center; gap:8px;
+}
+.exit-box .exit-actions .exit-close {
+  padding:14px 24px; border-radius:var(--r-full);
+  background:var(--surface); border:1px solid var(--border);
+  color:var(--text-secondary); font-weight:600;
+}
+.exit-box .exit-close-x {
+  position:absolute; top:16px; left:16px;
+  color:var(--text-muted); font-size:1.2rem;
+}
+
+/* ======================================================
+   CONVERSION — PRODUCT CARD ENHANCED
+   ====================================================== */
+.product-card .card-badges {
+  position:absolute; top:12px; right:12px; z-index:2;
+  display:flex; flex-direction:column; gap:6px;
+}
+[dir="ltr"] .product-card .card-badges { right:auto; left:12px; }
+.card-badge {
+  padding:4px 10px; border-radius:var(--r-sm);
+  font-size:.68rem; font-weight:700;
+  backdrop-filter:blur(8px);
+}
+.card-badge.hot { background:rgba(255,107,107,.9); color:#fff; }
+.card-badge.new { background:rgba(0,210,160,.9); color:#fff; }
+.card-badge.limited { background:rgba(253,203,110,.9); color:#1A1A2E; }
+.product-card .card-quick-view {
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  background:rgba(0,0,0,.4); backdrop-filter:blur(4px);
+  opacity:0; transition:opacity .3s; cursor:pointer;
+}
+.product-card:hover .card-quick-view { opacity:1; }
+.card-quick-view span {
+  padding:10px 24px; border-radius:var(--r-full);
+  background:rgba(255,255,255,.95); color:#1A1A2E;
+  font-weight:700; font-size:.85rem;
+  transform:translateY(8px); transition:transform .3s;
+}
+.product-card:hover .card-quick-view span { transform:translateY(0); }
+.product-card .card-rating {
+  display:flex; align-items:center; gap:4px;
+  margin-bottom:8px;
+}
+.card-rating .stars { color:var(--warning); font-size:.8rem; letter-spacing:1px; }
+.card-rating .count { font-size:.75rem; color:var(--text-muted); }
+
+/* ======================================================
+   REVEAL ANIMATION
+   ====================================================== */
+.reveal { opacity:0; transform:translateY(20px); transition:opacity .6s cubic-bezier(.4,0,.2,1), transform .6s cubic-bezier(.4,0,.2,1); }
+.reveal.visible { opacity:1; transform:translateY(0); }
+
+/* ======================================================
+   RESPONSIVE
+   ====================================================== */
+@media(max-width:1024px){
+  .dash-hero { grid-template-columns:1fr; text-align:center; padding:60px 5vw 40px; min-height:auto; }
+  .dash-hero-text p { margin:0 auto 32px; }
+  .dash-hero-visual { display:none; }
+  .stats-bar { grid-template-columns:repeat(2,1fr); }
+  .biz-grid { grid-template-columns:1fr; max-width:480px; margin:0 auto; }
+  .cats-grid { grid-template-columns:repeat(2,1fr); }
+  .products-grid { grid-template-columns:repeat(2,1fr); }
+  .test-grid { grid-template-columns:1fr; }
+  .about-row { grid-template-columns:1fr; text-align:center; }
+  .contact-grid { grid-template-columns:1fr; }
+  .topbar-nav { display:none; }
+  .burger { display:block; }
+}
+@media(max-width:640px){
+  .topbar { padding:0 16px; }
+  .stats-bar { grid-template-columns:1fr; padding:0 4vw 40px; }
+  .cats-grid, .products-grid { grid-template-columns:1fr; }
+  .store-section, .about-row { padding:40px 4vw; }
+  .contact-section { padding-bottom:60px; }
+  .test-section { margin:0 4vw; padding:40px 24px; }
+  .contact-grid { margin:0 4vw; }
+  .biz-section { padding:30px 4vw 60px; }
+  .float-wa { width:52px; height:52px; bottom:20px; left:20px; }
+  .float-wa svg { width:24px; height:24px; }
+  .modal-box { padding:28px 24px; }
+  .qv-box { grid-template-columns:1fr; }
+  .qv-img { min-height:200px; }
+  .social-proof { left:12px; right:12px; max-width:calc(100% - 24px); bottom:80px; }
+  .sticky-cta { display:flex !important; }
+  .trust-badge { padding:12px 16px; }
+  .trust-badge .tb-text h4 { font-size:.8rem; }
+  .orbit { transform:scale(.75); }
+  .dot-label { font-size:.55rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- Animated background orbs -->
+<div class="bg-orbs">
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+</div>
+
+<!-- Floating WhatsApp -->
+<a href="https://wa.me/213558253614" target="_blank" class="float-wa" id="floatWa" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+<!-- SOCIAL PROOF TOAST -->
+<div class="social-proof" id="socialProof">
+  <div class="sp-avatar" id="spAvatar">🛒</div>
+  <div class="sp-info">
+    <div class="sp-name" id="spName">—</div>
+    <div class="sp-action" id="spAction">—</div>
+    <div class="sp-time" id="spTime">—</div>
+  </div>
+  <button class="sp-close" onclick="hideSocialProof()">✕</button>
+</div>
+
+<!-- QUICK VIEW MODAL -->
+<div class="qv-overlay" id="qvOverlay" onclick="if(event.target===this)closeQuickView()">
+  <div class="qv-box" style="position:relative;">
+    <button class="qv-close" onclick="closeQuickView()">✕</button>
+    <div class="qv-img" id="qvImg"><div class="qv-placeholder">📦</div></div>
+    <div class="qv-details">
+      <div class="qv-badge badge-hot" id="qvBadge" style="display:none;"></div>
+      <h3 id="qvTitle">—</h3>
+      <div class="qv-price" id="qvPrice">—</div>
+      <div class="qv-desc" id="qvDesc">—</div>
+      <div class="qv-stock" id="qvStock"><div class="stock-dot in-stock"></div> <span>متوفر</span></div>
+      <div class="qv-actions">
+        <a class="qv-wa-btn" id="qvWaBtn" href="#" target="_blank">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          <span data-i18n="order_now">اطلب الآن</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXIT INTENT POPUP -->
+<div class="exit-popup" id="exitPopup">
+  <div class="exit-box">
+    <button class="exit-close-x" onclick="closeExitPopup()">✕</button>
+    <div class="exit-emoji">🎁</div>
+      <h3 data-i18n="exit_title">انتظري! لديكِ عرض خاص</h3>
+      <p data-i18n="exit_desc">احصلِ على خصم 10% على طلبكِ الأول! استخدمي كود <strong>WELCOME10</strong></p>
+    <div class="exit-offer">
+      <div class="offer-text" data-i18n="exit_offer">✨ كود WELCOME10 — صالح لمدة 24 ساعة</div>
+    </div>
+    <div class="exit-actions">
+      <a class="exit-wa" href="https://wa.me/213558253614?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B!%20%D8%A3%D8%B1%D9%8A%D8%AF%20%D8%A7%D8%B3%D8%AA%D8%AE%D8%AF%D8%A7%D9%85%20%D9%83%D9%88%D8%AF%20WELCOME10%20%D9%84%D9%84%D8%AE%D8%B5%D9%85" target="_blank" data-i18n="exit_btn">استخدم العرض الآن</a>
+      <button class="exit-close" onclick="closeExitPopup()" data-i18n="exit_later">لاحقًا</button>
+    </div>
+  </div>
+</div>
+
+<!-- STICKY MOBILE CTA -->
+<div class="sticky-cta" id="stickyCta">
+  <div class="cta-info">
+    <div class="cta-title" id="ctaTitle">ميمو مرسيري</div>
+    <div class="cta-sub" id="ctaSub">اطلب الآن عبر واتساب</div>
+  </div>
+  <a class="cta-wa" id="ctaWa" href="https://wa.me/213558253614" target="_blank">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    WhatsApp
+  </a>
+</div>
+
+<!-- TRUST BADGES (injected by JS) -->
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-logo" style="cursor:pointer" onclick="location.reload()">
+    <div class="logo-icon">M</div>
+    <span id="logoText">ميمو منصتي</span>
+  </div>
+  <nav class="topbar-nav" id="topbarNav">
+    <button class="active" data-page="home" data-i18n="tab_home">الرئيسية</button>
+    <button data-page="mercerie" data-i18n="tab_mercerie">ميمو مرسيري</button>
+    <button data-page="rental" data-i18n="tab_rental">ميمو أفراح</button>
+    <button data-page="patisserie" data-i18n="tab_patisserie">ميمو كيك</button>
+  </nav>
+  <div class="topbar-actions">
+    <div class="lang-switch">
+      <select class="lang-select" id="langSwitch">
+        <option value="ar" selected>AR</option>
+        <option value="fr">FR</option>
+        <option value="en">EN</option>
+      </select>
+    </div>
+    <button class="theme-btn" id="themeToggle">
+      <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+    </button>
+    <button class="burger" id="burgerBtn">☰</button>
+  </div>
+</header>
+
+<!-- Mobile Nav -->
+<div class="overlay" id="navOverlay"></div>
+<nav class="mobile-nav" id="mobileNav">
+  <button class="close-btn" id="closeNav">✕</button>
+  <a href="#" data-page="home" class="active" data-i18n="tab_home">الرئيسية</a>
+  <a href="#" data-page="mercerie" data-i18n="tab_mercerie">ميمو مرسيري</a>
+  <a href="#" data-page="rental" data-i18n="tab_rental">ميمو أفراح</a>
+  <a href="#" data-page="patisserie" data-i18n="tab_patisserie">ميمو كيك</a>
+</nav>
+
+<!-- ============ PAGE: HOME ============ -->
+<div id="page-home" class="page">
+  <div class="dash-hero">
+    <div class="dash-hero-text reveal">
+      <h1 data-i18n="home_title">مرحبًا بكِ في<br><span>عالم ميمو</span> ✨</h1>
+      <p data-i18n="home_sub">كل ما تحتاجينه من خيوط وكيك وأفراح — اطلبي الآن وسيُوصَل إليكِ</p>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;" class="hero-btns-container">
+        <a class="product-btn" style="display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:var(--r-full);width:auto;" href="https://wa.me/213558253614" target="_blank" data-i18n="home_cta1">ابدأ التصفح ←</a>
+      </div>
+    </div>
+    <div class="dash-hero-visual reveal">
+      <div class="orbit">
+        <div class="orbit-dot dot-mercerie" onclick="App.navigate('store','mercerie')">
+          <span class="dot-emoji">✂️</span>
+          <span class="dot-label">ميمو مرسيري</span>
+        </div>
+        <div class="orbit-dot dot-rental" onclick="App.navigate('store','rental')">
+          <span class="dot-emoji">💒</span>
+          <span class="dot-label">ميمو أفراح</span>
+        </div>
+        <div class="orbit-dot dot-patisserie" onclick="App.navigate('store','patisserie')">
+          <span class="dot-emoji">🎂</span>
+          <span class="dot-label">ميمو كيك</span>
+        </div>
+        <div class="orbit-dot dot-fb" onclick="window.open('https://facebook.com/','_blank')">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </div>
+        <div class="orbit-dot dot-insta" onclick="window.open('https://instagram.com/','_blank')">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        </div>
+        <div class="orbit-dot dot-tiktok" onclick="window.open('https://tiktok.com/','_blank')">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.51a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 0010.86 4.48V13.2a8.16 8.16 0 005.58 2.17v-3.45a4.85 4.85 0 01-3.77-1.58V6.69h3.77z"/></svg>
+        </div>
+        <div class="orbit-dot dot-youtube" onclick="window.open('https://youtube.com/','_blank')">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        </div>
+        <div class="orbit-center">M</div>
+        <div class="orbit-ring ring-1"></div>
+        <div class="orbit-ring ring-2"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-bar reveal" id="statsBar"></div>
+
+  <!-- TRUST BADGES -->
+  <div class="trust-badges reveal" id="trustBadges"></div>
+
+  <div class="biz-section">
+    <div class="biz-section-header reveal">
+      <h2 data-i18n="biz_title">أعمالي</h2>
+      <p data-i18n="biz_sub">اخترِي مشروعًا لعرض المنتجات والتفاصيل</p>
+    </div>
+    <div class="biz-grid" id="bizGrid"></div>
+  </div>
+</div>
+
+<!-- ============ PAGE: STORE ============ -->
+<div id="page-store" class="page hidden">
+  <div id="storeContent"></div>
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer" id="siteFooter">
+  <div class="footer-logo" style="cursor:pointer" onclick="location.reload()">
+    <div class="logo-icon">M</div>
+    <span data-i18n="footer_brand">ميمو منصتي</span>
+  </div>
+  <p class="footer-copy" data-i18n="footer_note">© 2026 ميمو منصتي — جميع الحقوق محفوظة</p>
+</footer>
+
+<script>
+/* ======================================================
+   CONFIG — عدّلي هذين السطرين فقط
+   ====================================================== */
+// اطلبي هذين السطرين من لوحة تحكم Supabase
+// Settings → API → URL و anon public
+const SUPABASE_URL = "https://znuwdlkrwzzbmgyzghva.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpudXdkbGtyd3p6Ym1neXpnaHZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4NDUxNTgsImV4cCI6MjEwMDQyMTE1OH0.IEf14yBXC2txC_rbVbHS2yHqVwasm2TWdU1jQvH9Ubo";
+let sb = null;
+try {
+  if (SUPABASE_URL.startsWith('http') && typeof window.supabase !== 'undefined') {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+} catch(e) { console.error(e); }
+
+/* ======================================================
+   BUSINESS DATA
+   ====================================================== */
+const BIZ = {
+  mercerie: {
+    id:'mercerie', emoji:'✂️',
+    name:{ar:'ميمو مرسيري',fr:'M Mercerie',en:'M Mercerie'},
+    tagline:{ar:'كل خيط، كل زر، كل فكرة',fr:'Chaque fil, chaque bouton, chaque idée',en:'Every thread, every button, every idea'},
+    location:{ar:'بوعردون، بومرداس',fr:'Bouârdoun, Boumerdès',en:'Bouârdoun, Boumerdès'},
+    phone:'0558 25 36 14', whatsapp:'213558253614',
+    hero_sub:{ar:'كل ما تحتاجينه من خيوط وأزرار وإبر، مُنظَّم وجاهز للطلب خلال دقيقتين',fr:'Tout ce qu\'il vous faut, prêt à commander en 2 minutes',en:'Everything you need, ready to order in 2 minutes'},
+    categories:[
+      {id:'threads',title:{ar:'خيوط',fr:'Fils',en:'Threads'},sub:{ar:'ألوان متعددة',fr:'Coloris variés',en:'Many colors'},icon:'🧵'},
+      {id:'buttons',title:{ar:'أزرار',fr:'Boutons',en:'Buttons'},sub:{ar:'أشكال متنوعة',fr:'Formes variées',en:'Various shapes'},icon:'🔘'},
+      {id:'needles',title:{ar:'إبر',fr:'Aiguilles',en:'Needles'},sub:{ar:'لكل نوع قماش',fr:'Pour chaque tissu',en:'For every fabric'},icon:'🪡'},
+      {id:'accessories',title:{ar:'إكسسوارات',fr:'Accessoires',en:'Accessories'},sub:{ar:'لمسة أخيرة',fr:'Touche finale',en:'Finishing touch'},icon:'✨'}
+    ],
+    trust:[
+      {ar:'تشكيلة تتجدد أسبوعيًا',fr:'Nouveautés chaque semaine',en:'New arrivals weekly'},
+      {ar:'رد سريع خلال دقائق',fr:'Réponse rapide',en:'Fast reply'},
+      {ar:'توصيل بومرداس والجزائر',fr:'Livraison Boumerdès et Alger',en:'Delivery in Boumerdès & Algiers'},
+      {ar:'جودة مضمونة',fr:'Qualité garantie',en:'Guaranteed quality'}
+    ],
+    testimonials:[
+      {text:{ar:'"جودة الخيوط ممتازة والرد سريعًا عبر واتساب."',fr:'"Excellente qualité de fils et réponse rapide."',en:'"Great thread quality and fast replies."'},who:{ar:'زبونة من بومرداس',fr:'Cliente de Boumerdès',en:'Boumerdès customer'},avatar:'ب'},
+      {text:{ar:'"وجدتُ كل المستلزمات في مكان واحد."',fr:'"J\'ai trouvé tout au même endroit."',en:'"Found everything in one place."'},who:{ar:'زبونة دائمة',fr:'Cliente fidèle',en:'Regular customer'},avatar:'ز'},
+      {text:{ar:'"أسعار معقولة وتشكيلة رائعة."',fr:'"Prix raisonnables et superbe sélection."',en:'"Fair prices and wonderful selection."'},who:{ar:'هاوية خياطة',fr:'Passionnée de couture',en:'Sewing enthusiast'},avatar:'ه'}
+    ],
+    about:{ar:'ميمو من فكرة بسيطة: تيسير الوصول إلى مستلزمات خياطة جيدة بأسعار عادلة.',fr:'M est née d\'une idée simple : rendre les fournitures de couture accessibles.',en:'M started with a simple idea: accessible quality sewing supplies.'},
+    faq:[
+      {q:{ar:'كيف يتم التوصيل؟',fr:'Livraison ?',en:'Delivery?'},a:{ar:'نوصل إلى بومرداس والجزائر خلال 24-48 ساعة، والدفع عند الاستلام.',fr:'Sous 24-48h, paiement à la livraison.',en:'Within 24-48h, cash on delivery.'}},
+      {q:{ar:'هل يمكن استبدال منتج؟',fr:'Échange ?',en:'Exchange?'},a:{ar:'نعم، تواصلي معنا عبر واتساب خلال 3 أيام من الاستلام.',fr:'Oui, sur WhatsApp sous 3 jours.',en:'Yes, on WhatsApp within 3 days.'}}
+    ],
+    storage_bucket:'mimo-images', table_products:'mercerie_products', table_articles:'mercerie_articles'
+  },
+  rental: {
+    id:'rental', emoji:'💒',
+    name:{ar:'ميمو أفراح',fr:'M Afrah',en:'M Afrah'},
+    tagline:{ar:'كل ما يحتاجه عرسك',fr:'Tout pour votre mariage',en:'Everything your wedding needs'},
+    location:{ar:'الجزائر العاصمة',fr:'Alger',en:'Algiers'},
+    phone:'0558 25 36 14', whatsapp:'213558253614',
+    hero_sub:{ar:'نؤجّر الطاولات والكراسي والديكور والإضاءة والخيام',fr:'Location de tables, chaises, décoration et tentes',en:'Rent tables, chairs, decor, lighting & tents'},
+    categories:[
+      {id:'tables',title:{ar:'طاولات',fr:'Tables',en:'Tables'},sub:{ar:'ضيافة وأعياد',fr:'Réception',en:'Reception'},icon:'🪑'},
+      {id:'chairs',title:{ar:'كراسي',fr:'Chaises',en:'Chairs'},sub:{ar:'أنيقة ومريحة',fr:'Élégantes',en:'Elegant'},icon:'💺'},
+      {id:'decor',title:{ar:'ديكور',fr:'Décoration',en:'Decor'},sub:{ar:'زينة وورد',fr:'Fleurs et déco',en:'Flowers & deco'},icon:'🌸'},
+      {id:'lighting',title:{ar:'إضاءة',fr:'Éclairage',en:'Lighting'},sub:{ar:'أجواء مميزة',fr:'Ambiance',en:'Ambiance'},icon:'💡'},
+      {id:'tents',title:{ar:'خيام',fr:'Tentes',en:'Tents'},sub:{ar:'للحفلات الخارجية',fr:'Plein air',en:'Outdoor'},icon:'⛺'}
+    ],
+    trust:[
+      {ar:'أفضل أسعار التأجير',fr:'Meilleurs prix',en:'Best prices'},
+      {ar:'توصيل وتركيب مجاني',fr:'Livraison et montage gratuits',en:'Free delivery & setup'},
+      {ar:'تجهيزات بحالة ممتازة',fr:'Matériel impeccable',en:'Perfect condition'},
+      {ar:'خدمة متابعة',fr:'Suivi client',en:'Follow-up service'}
+    ],
+    testimonials:[
+      {text:{ar:'"أجّرت لحفل زفافي وكانت النتيجة مذهلة."',fr:'"Location pour mon mariage, résultat magnifique."',en:'"Rented for my wedding — stunning result."'},who:{ar:'عروس سعيدة',fr:'Mariée comblée',en:'Happy bride'},avatar:'س'},
+      {text:{ar:'"خدمة ممتازة وتوصيل في الوقت."',fr:'"Service excellent et ponctuel."',en:'"Excellent service and on-time delivery."'},who:{ar:'عميلة من الجزائر',fr:'Cliente d\'Alger',en:'Algiers customer'},avatar:'م'},
+      {text:{ar:'"أسعار معقولة وجودة عالية."',fr:'"Prix raisonnables et haute qualité."',en:'"Fair prices and high quality."'},who:{ar:'منظم مناسبات',fr:'Organisateur',en:'Event organizer'},avatar:'ع'}
+    ],
+    about:{ar:'ميمو أفراح شريكك الموثوق لتأجير لوازم الأعراس والمناسبات.',fr:'M Afrah, votre partenaire de confiance pour la location événementielle.',en:'M Afrah, your trusted partner for event equipment rental.'},
+    faq:[
+      {q:{ar:'كيف يتم الحجز؟',fr:'Réservation ?',en:'Booking?'},a:{ar:'تواصلي معنا عبر واتساب واختاري التاريخ والمنتجات المطلوبة.',fr:'Contactez-nous et choisissez date et produits.',en:'Contact us and choose your date and products.'}},
+      {q:{ar:'هل التوصيل مجاني؟',fr:'Livraison gratuite ?',en:'Free delivery?'},a:{ar:'نعم، التوصيل والتركيب مجانيان داخل الجزائر العاصمة.',fr:'Oui, gratuit à Alger.',en:'Yes, free within Algiers.'}}
+    ],
+    storage_bucket:'rental-images', table_products:'rental_items', table_articles:'rental_bookings'
+  },
+  patisserie: {
+    id:'patisserie', emoji:'🎂',
+    name:{ar:'ميمو كيك',fr:'M Cake',en:'M Cake'},
+    tagline:{ar:'كعكة أحلامكِ... تُولد هنا',fr:'Votre gâteau de rêve... prend vie ici',en:'Your dream cake... comes to life here'},
+    location:{ar:'الجزائر العاصمة',fr:'Alger',en:'Algiers'},
+    phone:'0558 25 36 14', whatsapp:'213558253614',
+    hero_sub:{ar:'كعكات مصممة خصيصًا لكِ، بمكونات فاخرة وتفاصيل مذهلة',fr:'Gâteaux sur mesure avec ingrédients raffinés',en:'Custom cakes with premium ingredients'},
+    categories:[
+      {id:'wedding',title:{ar:'أعراس',fr:'Mariage',en:'Wedding'},sub:{ar:'تصاميم فاخرة',fr:'Créations raffinées',en:'Elegant designs'},icon:'👰'},
+      {id:'birthday',title:{ar:'أعياد ميلاد',fr:'Anniversaire',en:'Birthday'},sub:{ar:'أحلى لحظات',fr:'Moments sucrés',en:'Sweet moments'},icon:'🎈'},
+      {id:'cupcakes',title:{ar:'كب كيك',fr:'Cupcakes',en:'Cupcakes'},sub:{ar:'قطع صغيرة كبيرة',fr:'Petites bouchées',en:'Small bites'},icon:'🧁'},
+      {id:'custom',title:{ar:'حسب الطلب',fr:'Sur mesure',en:'Custom'},sub:{ar:'صمّمي كعكتك',fr:'Créez le vôtre',en:'Design yours'},icon:'🎨'}
+    ],
+    trust:[
+      {ar:'تصاميم حصرية',fr:'Créations exclusives',en:'Exclusive designs'},
+      {ar:'رد سريع',fr:'Réponse rapide',en:'Fast reply'},
+      {ar:'توصيل الجزائر العاصمة',fr:'Livraison Alger',en:'Delivery in Algiers'},
+      {ar:'مكونات فاخرة',fr:'Ingrédients raffinés',en:'Premium ingredients'}
+    ],
+    testimonials:[
+      {text:{ar:'"كعكة تحلمُ بها... التفاصيل كانت مذهلة."',fr:'"Au-delà de mes rêves — détails superbes."',en:'"Beyond my dreams — stunning details."'},who:{ar:'عميلة من الجزائر',fr:'Cliente d\'Alger',en:'Algiers customer'},avatar:'ب'},
+      {text:{ar:'"التصميم مطابق تمامًا للفكرة."',fr:'"Le design correspondait exactement."',en:'"The design matched exactly."'},who:{ar:'عروس سعيدة',fr:'Mariée comblée',en:'Happy bride'},avatar:'ز'},
+      {text:{ar:'"الكب كيك لذيذ وأنيق."',fr:'"Cupcakes délicieux et élégants."',en:'"Delicious and elegant cupcakes."'},who:{ar:'عميلة دائمة',fr:'Cliente fidèle',en:'Regular customer'},avatar:'ه'}
+    ],
+    about:{ar:'ميمو كيك وُلدت من شغف بتحويل المناسبات إلى ذكريات.',fr:'M Cake est née d\'une passion de transformer les occasions en souvenirs.',en:'M Cake was born from a passion for turning occasions into memories.'},
+    faq:[
+      {q:{ar:'قبل كم يوم يجب الحجز؟',fr:'Combien de jours avant ?',en:'How far ahead?'},a:{ar:'يُنصح بالحجز قبل 3-5 أيام، و قبل أسبوعين للأعراس.',fr:'3-5 jours, 2 semaines pour mariages.',en:'3-5 days, 2 weeks for weddings.'}},
+      {q:{ar:'هل التصميم قابل للتخصيص؟',fr:'Design personnalisable ?',en:'Customizable?'},a:{ar:'نعم، نقدم استشارة مجانية لتصميم كعكتك كما تريدين.',fr:'Oui, consultation gratuite.',en:'Yes, free consultation.'}}
+    ],
+    storage_bucket:'cake-images', table_products:'patisserie_products', table_articles:'patisserie_articles'
+  }
+};
+
+/* ======================================================
+   TRANSLATIONS
+   ====================================================== */
+const T = {
+  tab_home:{ar:'الرئيسية',fr:'Accueil',en:'Home'},
+  tab_mercerie:{ar:'ميمو مرسيري',fr:'M Mercerie',en:'M Mercerie'},
+  tab_rental:{ar:'ميمو أفراح',fr:'M Afrah',en:'M Afrah'},
+  tab_patisserie:{ar:'ميمو كيك',fr:'M Cake',en:'M Cake'},
+  home_title:{ar:'مرحبًا بكِ في<br><span>عالم ميمو</span> ✨',fr:'Bienvenue dans<br><span>l\'univers M</span> ✨',en:'Welcome to<br><span>the M world</span> ✨'},
+  home_sub:{ar:'كل ما تحتاجينه من خيوط وكيك وأفراح — اطلبي الآن وسيُوصَل إليكِ',fr:'Tout ce dont vous avez besoin — commandez maintenant, livré chez vous',en:'Everything you need — order now, delivered to your door'},
+  home_cta1:{ar:'ابدئي التصفح ←',fr:'Commencer →',en:'Get started →'},
+  biz_title:{ar:'مشاريعي',fr:'Mes entreprises',en:'My businesses'},
+  biz_sub:{ar:'اخترِي مشروعًا لعرض المنتجات والتفاصيل',fr:'Choisissez une entreprise pour voir les produits',en:'Choose a business to view products'},
+  back_home:{ar:'← الرئيسية',fr:'← Accueil',en:'← Home'},
+  prod_btn:{ar:'اطلبي عبر واتساب',fr:'Commander sur WhatsApp',en:'Order on WhatsApp'},
+  about_eyebrow:{ar:'من نحن',fr:'Qui sommes-nous',en:'About us'},
+  faq_title:{ar:'أسئلة شائعة',fr:'Questions fréquentes',en:'FAQ'},
+  test_title:{ar:'آراء عميلاتنا',fr:'Avis clientes',en:'Customer reviews'},
+  contact_title:{ar:'تواصلي معنا',fr:'Contactez-nous',en:'Contact us'},
+  form_name:{ar:'الاسم',fr:'Nom',en:'Name'},
+  form_phone:{ar:'رقم الهاتف',fr:'Téléphone',en:'Phone'},
+  form_message:{ar:'رسالتك',fr:'Votre message',en:'Your message'},
+  form_submit:{ar:'إرسال',fr:'Envoyer',en:'Send'},
+  footer_brand:{ar:'ميمو منصتي',fr:'M Plateforme',en:'M Platform'},
+  footer_note:{ar:'© 2026 ميمو منصتي — جميع الحقوق محفوظة',fr:'© 2026 M — Tous droits réservés',en:'© 2026 M — All rights reserved'},
+  order_now:{ar:'اطلبي الآن',fr:'Commander',en:'Order now'},
+  exit_title:{ar:'انتظري! لديكِ عرض خاص',fr:'Attendez! Offre spéciale',en:'Wait! Special offer'},
+  exit_desc:{ar:'احصلِ على خصم 10% على طلبكِ الأول!',fr:'Obtenez 10% de réduction sur votre 1ère commande!',en:'Get 10% off your first order!'},
+  exit_offer:{ar:'كود WELCOME10 — صالح لمدة 24 ساعة',fr:'Code WELCOME10 — Valable 24h',en:'Code WELCOME10 — Valid 24 hours'},
+  exit_btn:{ar:'استخدمي العرض الآن',fr:'Utiliser l\'offre',en:'Claim offer'},
+  exit_later:{ar:'لاحقًا',fr:'Plus tard',en:'Later'},
+  trust_delivery:{ar:'توصيل سريع',fr:'Livraison rapide',en:'Fast delivery'},
+  trust_delivery_sub:{ar:'إلى بومرداس والجزائر العاصمة',fr:'Boumerdès et Alger',en:'Boumerdès & Algiers'},
+  trust_payment:{ar:'الدفع عند الاستلام',fr:'Paiement à la livraison',en:'Cash on delivery'},
+  trust_payment_sub:{ar:'ادفعي فقط عند استلام الطلب',fr:'Payez à réception',en:'Pay on receipt'},
+  trust_quality:{ar:'جودة مضمونة',fr:'Qualité garantie',en:'Guaranteed quality'},
+  trust_quality_sub:{ar:'منتجات مختارة بعناية',fr:'Produits soigneusement sélectionnés',en:'Carefully selected products'},
+  trust_support:{ar:'دعم فوري',fr:'Support instantané',en:'Instant support'},
+  trust_support_sub:{ar:'رد خلال دقائق',fr:'Réponse en minutes',en:'Reply within minutes'},
+  sp_just_bought:{ar:'اشترت للتو',fr:'vient d\'acheter',en:'just purchased'}
+};
+
+/* ======================================================
+   STATE
+   ====================================================== */
+let currentPage='home', currentBusiness=null;
+let allData={mercerie:{products:[],articles:[]},rental:{products:[],articles:[]},patisserie:{products:[],articles:[]}};
+let currentLang='ar';
+
+/* ======================================================
+   APP / ROUTER
+   ====================================================== */
+const App = {
+  navigate(page, biz) {
+    currentPage=page; currentBusiness=biz||null;
+    document.getElementById('page-home').classList.toggle('hidden',page!=='home');
+    document.getElementById('page-store').classList.toggle('hidden',page!=='store');
+    document.getElementById('siteFooter').classList.toggle('hidden',page!=='home');
+    document.querySelectorAll('.topbar-nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page||(page==='store'&&b.dataset.page===biz)));
+    document.querySelectorAll('.mobile-nav a').forEach(a=>a.classList.toggle('active',a.dataset.page===page||(page==='store'&&a.dataset.page===biz)));
+    if(page==='store'&&biz) this.renderStore(biz);
+    window.scrollTo({top:0,behavior:'smooth'});
+    setTimeout(()=>initReveal(),150);
+  },
+
+  renderHome() {
+    // Stats
+    const totalProducts = Object.values(allData).reduce((s,d)=>s+d.products.length,0);
+    const totalArticles = Object.values(allData).reduce((s,d)=>s+d.articles.length,0);
+    document.getElementById('statsBar').innerHTML = [
+      {label:{ar:'إجمالي المنتجات',fr:'Total produits',en:'Total products'},value:totalProducts,change:'+'},
+      {label:{ar:'المقالات',fr:'Articles',en:'Articles'},value:totalArticles,change:'+'},
+      {label:{ar:'الأعمال النشطة',fr:'Entreprises actives',en:'Active businesses'},value:3,change:''},
+      {label:{ar:'اللغات',fr:'Langues',en:'Languages'},value:3,change:'AR/FR/EN'}
+    ].map(s=>`<div class="stat-card reveal"><div class="stat-label">${s.label[currentLang]}</div><div class="stat-value">${s.value}</div>${s.change?`<div class="stat-change">${s.change}</div>`:''}</div>`).join('');
+
+    // Business cards
+    document.getElementById('bizGrid').innerHTML = Object.values(BIZ).map(b=>{
+      const prodCount = allData[b.id].products.length;
+      return `<div class="biz-card reveal" data-biz="${b.id}" onclick="App.navigate('store','${b.id}')">
+        <div class="biz-card-header"><div class="biz-bg"></div><div class="biz-icon">${b.emoji}</div></div>
+        <div class="biz-card-body">
+          <h3>${b.name[currentLang]}</h3>
+          <p>${b.tagline[currentLang]}</p>
+          <div class="biz-card-meta">
+            <span class="biz-tag"><span class="pill-dot" style="background:var(--biz-${b.id})"></span> ${b.location[currentLang]}</span>
+            <span class="biz-tag">${prodCount} ${currentLang==='ar'?'منتج':currentLang==='fr'?'produits':'products'}</span>
+          </div>
+          <div class="biz-card-arrow">→</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    // Trust badges
+    document.getElementById('trustBadges').innerHTML = [
+      {icon:'🚚',cls:'tb-green',t:'trust_delivery',sub:'trust_delivery_sub'},
+      {icon:'💰',cls:'tb-blue',t:'trust_payment',sub:'trust_payment_sub'},
+      {icon:'✅',cls:'tb-orange',t:'trust_quality',sub:'trust_quality_sub'},
+      {icon:'💬',cls:'tb-pink',t:'trust_support',sub:'trust_support_sub'}
+    ].map(tb=>`<div class="trust-badge reveal"><div class="tb-icon ${tb.cls}">${tb.icon}</div><div class="tb-text"><h4>${T[tb.t][currentLang]}</h4><p>${T[tb.sub][currentLang]}</p></div></div>`).join('');
+  },
+
+  renderStore(bizId) {
+    const b=BIZ[bizId]; if(!b) return;
+    const products=allData[bizId].products;
+    document.getElementById('storeContent').innerHTML = `
+      <div class="store-header">
+        <button class="back-btn" onclick="App.navigate('home')">${T.back_home[currentLang]}</button>
+        <h1>${b.emoji} ${b.name[currentLang]}</h1>
+        <p>${b.hero_sub[currentLang]}</p>
+      </div>
+      <div class="store-pills">${b.trust.map(t=>`<div class="pill"><span class="pill-dot"></span>${t[currentLang]}</div>`).join('')}</div>
+
+      <div class="store-section">
+        <div class="store-section-header"><h2>${currentLang==='ar'?'تصفّحي حسب الفئة':currentLang==='fr'?'Parcourez par catégorie':'Browse by category'}</h2></div>
+        <div class="cats-grid">${b.categories.map(c=>`
+          <div class="cat-card reveal">
+            <div class="cat-icon">${c.icon}</div>
+            <h3>${c.title[currentLang]}</h3><span>${c.sub[currentLang]}</span>
+          </div>`).join('')}</div>
+      </div>
+
+      <div class="store-section">
+        <div class="store-section-header"><h2>${currentLang==='ar'?'المنتجات':currentLang==='fr'?'Produits':'Products'}</h2></div>
+        <div class="products-grid">${products.length?products.map((p,idx)=>{
+          const badges=[];
+          if(idx===0) badges.push('<span class="card-badge hot">🔥 '+((currentLang==='ar'?'الأكثر مبيعًا':currentLang==='fr'?'Best-seller':'Best-seller'))+'</span>');
+          if(idx===1) badges.push('<span class="card-badge new">✨ '+((currentLang==='ar'?'جديد':currentLang==='fr'?'Nouveau':'New'))+'</span>');
+          if(idx===products.length-1&&products.length>3) badges.push('<span class="card-badge limited">⚡ '+((currentLang==='ar'?'stock limité':currentLang==='fr'?'Stock limité':'Limited stock'))+'</span>');
+          const rating=Math.floor(Math.random()*2)+4;
+          const reviewCount=Math.floor(Math.random()*30)+5;
+          const waText=encodeURIComponent('مرحبًا، أريد الاستفسار عن '+p.title+(p.price?' — السعر: '+p.price:''));
+          return `<div class="product-card reveal">
+            <div class="card-badges">${badges.join('')}</div>
+            <div class="product-img">${p.image_url?`<img src="${p.image_url}" alt="${p.title}">`:`<span class="placeholder-icon">${b.emoji}</span>`}
+              <div class="card-quick-view" onclick="openQuickView('${(p.title||'').replace(/'/g,"\\'")}','${(p.price||'').replace(/'/g,"\\'")}','${(p.description||'').replace(/'/g,"\\'")}','${(p.image_url||'').replace(/'/g,"\\'")}','${b.whatsapp}','${waText.replace(/'/g,"\\'")}')"><span>👁 ${(currentLang==='ar'?'عرض سريع':currentLang==='fr'?'Aperçu rapide':'Quick view')}</span></div>
+            </div>
+            <div class="product-body">
+              <div class="card-rating"><span class="stars">${'★'.repeat(rating)}${'☆'.repeat(5-rating)}</span><span class="count">(${reviewCount})</span></div>
+              <h3>${p.title}</h3>
+              ${p.price?`<span class="price">${p.price}</span>`:''}
+              <a href="https://wa.me/${b.whatsapp}?text=${waText}" target="_blank" class="product-btn">${T.prod_btn[currentLang]}</a>
+            </div>
+          </div>`;
+        }).join(''):`<p style="text-align:center;grid-column:1/-1;color:var(--text-muted);padding:40px 0;">${currentLang==='ar'?'لا توجد منتجات بعد':currentLang==='fr'?'Aucun produit':'No products yet'}</p>`}</div>
+      </div>
+
+      <div class="store-section">
+        <div class="test-section">
+          <div class="store-section-header"><h2>${T.test_title[currentLang]}</h2></div>
+          <div class="test-grid">${b.testimonials.map(t=>`
+            <div class="test-card reveal">
+              <div class="test-stars">★★★★★</div>
+              <p>${t.text[currentLang]}</p>
+              <div class="test-who"><div class="test-avatar">${t.avatar}</div>${t.who[currentLang]}</div>
+            </div>`).join('')}</div>
+        </div>
+      </div>
+
+      <div class="store-section">
+        <div class="about-row">
+          <div class="about-visual"><div class="about-shape">${b.emoji}</div></div>
+          <div class="about-text"><h2>${T.about_eyebrow[currentLang]}</h2><p>${b.about[currentLang]}</p></div>
+        </div>
+      </div>
+
+      <div class="store-section">
+        <div class="store-section-header"><h2>${T.faq_title[currentLang]}</h2></div>
+        <div class="faq-list">${b.faq.map(f=>`
+          <details class="faq-item reveal"><summary>${f.q[currentLang]}</summary><div class="faq-body">${f.a[currentLang]}</div></details>`).join('')}</div>
+      </div>
+
+      <div class="store-section contact-section">
+        <div class="contact-grid">
+          <div class="contact-info">
+            <h2>${T.contact_title[currentLang]}</h2>
+            <div class="contact-row">📞 ${b.phone}</div>
+            <div class="contact-row">📍 ${b.location[currentLang]}</div>
+            <a href="https://wa.me/${b.whatsapp}" target="_blank" class="wa-btn-contact">💬 WhatsApp →</a>
+          </div>
+          <form class="contact-form-side" onsubmit="event.preventDefault();window.open('https://wa.me/${b.whatsapp}?text='+encodeURIComponent('مرحبًا، اسمي '+this.name.value+'. '+this.message.value),'_blank');">
+            <input type="text" name="name" placeholder="${T.form_name[currentLang]}" required>
+            <input type="tel" name="phone" placeholder="${T.form_phone[currentLang]}" required>
+            <textarea name="message" placeholder="${T.form_message[currentLang]}" required></textarea>
+            <button type="submit" class="submit-btn">${T.form_submit[currentLang]}</button>
+          </form>
+        </div>
+      </div>
+    `;
+    document.getElementById('floatWa').href=`https://wa.me/${b.whatsapp}`;
+    setTimeout(()=>initReveal(),100);
+  }
+};
+
+/* ======================================================
+   DATA LOADING
+   ====================================================== */
+async function loadData(bizId) {
+  if(!sb) return;
+  const b=BIZ[bizId];
+  try {
+    const [p,a] = await Promise.all([
+      sb.from(b.table_products).select('*').order('created_at',{ascending:true}),
+      sb.from(b.table_articles).select('*').order('created_at',{ascending:true})
+    ]);
+    allData[bizId].products=p.data||[];
+    allData[bizId].articles=a.data||[];
+  } catch(e) { console.error(`Load ${bizId}:`,e); }
+}
+async function loadAllData() { if(!sb) return; await Promise.all(['mercerie','rental','patisserie'].map(loadData)); }
+
+/* ======================================================
+   THEME & LANGUAGE
+   ====================================================== */
+const html=document.documentElement;
+function setTheme(m){html.setAttribute('data-theme',m);document.getElementById('themeIcon').innerHTML=m==='dark'?'<path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle cx="12" cy="12" r="4"/>':'<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';}
+setTheme('dark');
+document.getElementById('themeToggle').addEventListener('click',()=>setTheme(html.getAttribute('data-theme')==='dark'?'light':'dark'));
+
+function applyLanguage(lang){
+  currentLang=lang;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.getAttribute('data-i18n'),e=T[k]; if(!e) return;
+    el.innerHTML=e[lang];
+  });
+  html.setAttribute('lang',lang); html.setAttribute('dir',lang==='ar'?'rtl':'ltr');
+  if(currentPage==='home') App.renderHome();
+  if(currentPage==='store'&&currentBusiness) App.renderStore(currentBusiness);
+}
+document.getElementById('langSwitch').addEventListener('change',e=>applyLanguage(e.target.value));
+
+/* ======================================================
+   NAVIGATION
+   ====================================================== */
+document.querySelectorAll('.topbar-nav button, .mobile-nav a[data-page]').forEach(btn=>{
+  btn.addEventListener('click',e=>{
+    e.preventDefault(); const p=btn.dataset.page;
+    if(p==='home') App.navigate('home');
+    else App.navigate('store',p);
+    closeMenu();
+  });
+});
+const burgerBtn=document.getElementById('burgerBtn'),mobileNav=document.getElementById('mobileNav'),navOverlay=document.getElementById('navOverlay'),closeNavBtn=document.getElementById('closeNav');
+function openMenu(){mobileNav.classList.add('open');navOverlay.classList.add('open');}
+function closeMenu(){mobileNav.classList.remove('open');navOverlay.classList.remove('open');}
+burgerBtn.addEventListener('click',openMenu);
+closeNavBtn.addEventListener('click',closeMenu);
+navOverlay.addEventListener('click',closeMenu);
+
+/* ======================================================
+   REVEAL
+   ====================================================== */
+function initReveal(){
+  document.querySelectorAll('.reveal:not(.visible)').forEach(el=>{
+    const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}});},{threshold:.12});
+    io.observe(el);
+  });
+}
+
+/* ======================================================
+   CONVERSION — SOCIAL PROOF
+   ====================================================== */
+const SP_NAMES_AR=['سارة','فاطمة','ليلى','نور','آية','مريم','خديجة','هدى','سلمى','ياسمين'];
+const SP_NAMES_FR=['Sarah','Fatima','Leila','Nour','Aya','Meriem','Khadija','Houda','Salma','Yasmine'];
+const SP_CITIES=['بومرداس','الجزائر','تيزي وزو','بجاية','البويرة'];
+const SP_PRODUCTS={
+  mercerie:['خيط كوتون أزرق','إبر خياطة','أزرار لؤلؤ','شريط مطاطي','خيط كركم'],
+  rental:['جهاز كوافير','طاولة طعام فخمة','كرسي عريس','ستارة ورد','إضاءة حفلات'],
+  patisserie:['كيكة شوكولاتة','ماكرون فراولة','تارت فواكه','كيكة زفاف','كوكيز بالشوكولاتة']
+};
+
+let spTimer=null;
+function showSocialProof(){
+  if(currentPage!=='home'&&currentPage!=='store') return;
+  const isAr=currentLang==='ar';
+  const bizKeys=Object.keys(SP_PRODUCTS);
+  const bizKey=bizKeys[Math.floor(Math.random()*bizKeys.length)];
+  const b=BIZ[bizKey];
+  const prodList=SP_PRODUCTS[bizKey];
+  const prod=prodList[Math.floor(Math.random()*prodList.length)];
+  const name=isAr?SP_NAMES_AR[Math.floor(Math.random()*SP_NAMES_AR.length)]:SP_NAMES_FR[Math.floor(Math.random()*SP_NAMES_FR.length)];
+  const city=SP_CITIES[Math.floor(Math.random()*SP_CITIES.length)];
+  const ago=Math.floor(Math.random()*15)+1;
+  const timeText=isAr?`منذ ${ago} دقائق`:currentLang==='fr'?`il y a ${ago} min`:`${ago} min ago`;
+
+  document.getElementById('spAvatar').textContent=b.emoji;
+  document.getElementById('spName').textContent=name+(isAr?' من '+city:' ('+city+')');
+  document.getElementById('spAction').textContent=(isAr?'اشترت للتو':currentLang==='fr'?'a acheté':'bought')+' — '+prod;
+  document.getElementById('spTime').textContent=timeText;
+
+  const el=document.getElementById('socialProof');
+  el.classList.add('show');
+  clearTimeout(spTimer);
+  spTimer=setTimeout(()=>el.classList.remove('show'),5000);
+}
+
+function hideSocialProof(){document.getElementById('socialProof').classList.remove('show');clearTimeout(spTimer);}
+
+/* ======================================================
+   CONVERSION — QUICK VIEW
+   ====================================================== */
+function openQuickView(title,price,desc,imageUrl,whatsapp,waText){
+  document.getElementById('qvTitle').textContent=title;
+  document.getElementById('qvPrice').textContent=price||((currentLang==='ar'?'السعر عند الاستفسار':currentLang==='fr'?'Prix sur demande':'Price on request'));
+  document.getElementById('qvDesc').textContent=desc||(currentLang==='ar'?'منتج مميز بجودة عالية.':currentLang==='fr'?'Produit de haute qualité.':'High-quality product.');
+
+  const imgContainer=document.getElementById('qvImg');
+  if(imageUrl){imgContainer.innerHTML=`<img src="${imageUrl}" alt="${title}">`;}
+  else{imgContainer.innerHTML=`<div class="qv-placeholder">${BIZ.mercerie.emoji}</div>`;}
+
+  const badges=['hot','new','limited'];
+  const labels=['🔥 '+((currentLang==='ar'?'الأكثر مبيعًا':currentLang==='fr'?'Best-seller':'Best-seller')),'✨ '+((currentLang==='ar'?'جديد':currentLang==='fr'?'Nouveau':'New')),'⚡ '+((currentLang==='ar'?'Stock limité':currentLang==='fr'?'Stock limité':'Limited stock'))];
+  const badgeIdx=Math.floor(Math.random()*3);
+  const badgeEl=document.getElementById('qvBadge');
+  badgeEl.className='qv-badge badge-'+badges[badgeIdx];
+  badgeEl.textContent=labels[badgeIdx];
+  badgeEl.style.display='inline-flex';
+
+  const stock=Math.floor(Math.random()*10)+1;
+  const stockEl=document.getElementById('qvStock');
+  if(stock<=3){
+    stockEl.innerHTML=`<div class="stock-dot low-stock"></div> <span>${currentLang==='ar'?'متبقي '+stock+' فقط':currentLang==='fr'?'Plus que '+stock+' en stock':'Only '+stock+' left'}</span>`;
+  } else {
+    stockEl.innerHTML=`<div class="stock-dot in-stock"></div> <span>${currentLang==='ar'?'متوفر':currentLang==='fr'?'En stock':'In stock'}</span>`;
+  }
+
+  document.getElementById('qvWaBtn').href='https://wa.me/'+whatsapp+'?text='+waText;
+  document.getElementById('qvOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeQuickView(){
+  document.getElementById('qvOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+/* ======================================================
+   CONVERSION — STICKY CTA
+   ====================================================== */
+function updateStickyCta(){
+  const sticky=document.getElementById('stickyCta');
+  const floatWa=document.getElementById('floatWa');
+  if(currentPage==='store'&&currentBusiness){
+    const b=BIZ[currentBusiness];
+    document.getElementById('ctaTitle').textContent=b.emoji+' '+b.name[currentLang];
+    document.getElementById('ctaSub').textContent=(currentLang==='ar'?'اطلب الآن عبر واتساب':currentLang==='fr'?'Commandez via WhatsApp':'Order via WhatsApp');
+    document.getElementById('ctaWa').href='https://wa.me/'+b.whatsapp;
+    sticky.classList.add('visible');
+    floatWa.style.display='none';
+  } else if(currentPage==='home'){
+    sticky.classList.remove('visible');
+    floatWa.style.display='';
+  } else {
+    sticky.classList.remove('visible');
+    floatWa.style.display='none';
+  }
+}
+
+/* ======================================================
+   CONVERSION — EXIT INTENT
+   ====================================================== */
+let exitShown=false;
+function closeExitPopup(){document.getElementById('exitPopup').classList.remove('show');exitShown=true;}
+document.addEventListener('mouseout',e=>{
+  if(exitShown||currentPage!=='home') return;
+  if(e.clientY<5){setTimeout(()=>{if(!exitShown)document.getElementById('exitPopup').classList.add('show');},800);}
+});
+document.addEventListener('touchstart',e=>{
+  if(exitShown||currentPage!=='home') return;
+  if(e.touches[0].clientY<5){setTimeout(()=>{if(!exitShown)document.getElementById('exitPopup').classList.add('show');},800);}
+});
+
+/* ======================================================
+   CONVERSION — INIT
+   ====================================================== */
+setTimeout(()=>showSocialProof(),8000);
+setInterval(()=>showSocialProof(),25000);
+
+/* ======================================================
+   INIT
+   ====================================================== */
+(async function(){
+  if(sb){await loadAllData();}
+  App.renderHome(); initReveal(); updateStickyCta();
+})();
+
+/* Override navigate to update sticky CTA */
+const _origNav=App.navigate.bind(App);
+App.navigate=function(page,biz){_origNav(page,biz);updateStickyCta();};
+</script>
+</body>
+</html>
