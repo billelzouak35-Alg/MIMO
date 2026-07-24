@@ -1399,6 +1399,8 @@ async function loadData(bizId) {
       sb.from(b.table_products).select('*').order('created_at',{ascending:true}),
       sb.from(b.table_articles).select('*').order('created_at',{ascending:true})
     ]);
+    if(p.error) console.error(`Products ${bizId}:`,p.error.message);
+    if(a.error) console.error(`Articles ${bizId}:`,a.error.message);
     allData[bizId].products=p.data||[];
     allData[bizId].articles=a.data||[];
   } catch(e) { console.error(`Load ${bizId}:`,e); }
